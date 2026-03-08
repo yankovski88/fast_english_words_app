@@ -66,6 +66,21 @@ export class WordTableManager {
     public getAllWords(): WordRow[] {
         return [...this.words];
     }
+    // Добавьте этот метод в класс WordTableManager
+    public getImportTemplate(): any {
+        return [
+            {
+                id: 1,
+                word: "example",
+                transcription: "/ɪɡˈzæmpəl/",
+                translation: "пример",
+                partOfSpeech: "сущ.",
+                example: "This is an example sentence.",
+                exampleTranslation: "Это пример предложения.",
+                rootFamily: "example"
+            }
+        ];
+    }
 
     public getStudyWords(): WordRow[] {
         const studyWords = this.words.filter(word => !word.learned && !word.blacklisted);

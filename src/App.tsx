@@ -4,6 +4,13 @@ import { wordTable } from './data/wordTable';
 import WordTable from './components/WordTable';
 import { WordRow } from './types/word.types';
 
+// Глобальная функция для озвучки из таблицы
+declare global {
+    interface Window {
+        speakWord?: (text: string, lang: 'en' | 'ru') => void;
+    }
+}
+
 function App() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [studyWords, setStudyWords] = useState<WordRow[]>([]);
@@ -18,7 +25,7 @@ function App() {
     const [showSentenceRu, setShowSentenceRu] = useState(true);
     const [highlightWords, setHighlightWords] = useState(true);
 
-    // Состояния для сворачивания блоков
+    // Состояния для сворачивания блоков настроек
     const [showDisplaySettings, setShowDisplaySettings] = useState(true);
     const [showVoiceSettings, setShowVoiceSettings] = useState(true);
     const [showSpeedSettings, setShowSpeedSettings] = useState(true);
@@ -33,7 +40,7 @@ function App() {
 
     // Скорость речи
     const [englishSpeechRate, setEnglishSpeechRate] = useState(0.9);
-    const [russianSpeechRate, setRussianSpeechRate] = useState(0.9); // Теперь до 5
+    const [russianSpeechRate, setRussianSpeechRate] = useState(0.9);
 
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [voicesLoaded, setVoicesLoaded] = useState(false);
@@ -48,78 +55,18 @@ function App() {
     const isProcessingRef = useRef(false);
     const wasAnyVoiceEnabled = useRef(false); // Флаг для отслеживания первого включения
 
-    // Эффект для управления скоростью при включении/выключении озвучки
-    useEffect(() => {
-        const anyVoiceEnabled = speakEnglish || speakRussian;
-
-        if (anyVoiceEnabled) {
-            // Если озвучка только что включилась (была false, стала true)
-            if (!wasAnyVoiceEnabled.current) {
-                console.log('🔊 Озвучка включена - ставим скорость на минимум');
-                setSpeed(0.05); // Минимальная скорость
-            }
-            wasAnyVoiceEnabled.current = true;
-        } else {
-            // Если озвучка только что выключилась (была true, стала false)
-            if (wasAnyVoiceEnabled.current) {
-                console.log('🔇 Озвучка выключена - возвращаем скорость:', userSpeed);
-                setSpeed(userSpeed); // Возвращаем пользовательскую скорость
-            }
-            wasAnyVoiceEnabled.current = false;
-        }
-    }, [speakEnglish, speakRussian]);
-
-    // Загрузка слов при монтировании
-    useEffect(() => {
-        loadStudyWords();
-
-        return () => {
-            isMountedRef.current = false;
-            if (timerRef.current) {
-                clearTimeout(timerRef.current);
-            }
-        };
-    }, []);
-
-    // Загрузка слов для изучения
+    // ============================================
+    // ФУНКЦИЯ ЗАГРУЗКИ СЛОВ
+    // ============================================
     const loadStudyWords = () => {
         const words = wordTable.getStudyWords();
         setStudyWords(words);
         setCurrentIndex(0);
     };
 
-    // Загрузка голосов
-    useEffect(() => {
-        const loadVoices = () => {
-            const availableVoices = window.speechSynthesis.getVoices();
-
-            if (availableVoices.length > 0) {
-                const englishVoice = availableVoices.find(v =>
-                    v.lang.includes('en-US') || v.lang.includes('en-GB') || v.lang.includes('en')
-                );
-
-                const russianVoice = availableVoices.find(v =>
-                    v.lang.includes('ru-RU') || v.lang.includes('ru')
-                );
-
-                voicesRef.current = {
-                    english: englishVoice || availableVoices[0],
-                    russian: russianVoice || availableVoices[0]
-                };
-                setVoicesLoaded(true);
-            }
-        };
-
-        loadVoices();
-
-        if (window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = loadVoices;
-        }
-
-        return () => {
-            window.speechSynthesis.cancel();
-        };
-    }, []);
+    // ============================================
+    // ВСЕ useCallback ФУНКЦИИ
+    // ============================================
 
     // Функция озвучивания
     const speak = useCallback((text: string, lang: 'en' | 'ru') => {
@@ -151,7 +98,7 @@ function App() {
         });
     }, [englishSpeechRate, russianSpeechRate]);
 
-    // Озвучивание текущего слова
+    // Озвучивание текущего слова (для автопоказа)
     const speakCurrentWord = useCallback(async () => {
         if (isProcessingRef.current || studyWords.length === 0) return;
 
@@ -171,8 +118,8 @@ function App() {
         }
     }, [currentIndex, studyWords, speakEnglish, speakRussian, speak]);
 
-    // Ручное озвучивание
-    const speakManually = useCallback(() => {
+    // Ручное озвучивание ТОЛЬКО английского слова (работает ВСЕГДА!)
+    const speakEnglishManually = useCallback(() => {
         if (studyWords.length === 0) return;
 
         window.speechSynthesis.cancel();
@@ -180,9 +127,24 @@ function App() {
         isProcessingRef.current = false;
 
         setTimeout(() => {
-            speakCurrentWord();
+            // Убираем проверку speakEnglish - озвучиваем всегда!
+            speak(studyWords[currentIndex].word, 'en');
         }, 100);
-    }, [speakCurrentWord, studyWords.length]);
+    }, [currentIndex, studyWords, speak]);
+
+    // Ручное озвучивание ТОЛЬКО русского слова (работает ВСЕГДА!)
+    const speakRussianManually = useCallback(() => {
+        if (studyWords.length === 0) return;
+
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+        isProcessingRef.current = false;
+
+        setTimeout(() => {
+            // Убираем проверку speakRussian - озвучиваем всегда!
+            speak(studyWords[currentIndex].translation, 'ru');
+        }, 100);
+    }, [currentIndex, studyWords, speak]);
 
     // Отметить слово как выученное
     const toggleLearned = useCallback(() => {
@@ -217,6 +179,87 @@ function App() {
 
         setCurrentIndex(prev => (prev - 1 + studyWords.length) % studyWords.length);
     }, [isPlaying, studyWords.length]);
+
+    // ============================================
+    // ВСЕ ХУКИ useEffect
+    // ============================================
+
+    // Загрузка слов при монтировании
+    useEffect(() => {
+        loadStudyWords();
+
+        return () => {
+            isMountedRef.current = false;
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+            }
+        };
+    }, []);
+
+    // Загрузка голосов
+    useEffect(() => {
+        const loadVoices = () => {
+            const availableVoices = window.speechSynthesis.getVoices();
+
+            if (availableVoices.length > 0) {
+                const englishVoice = availableVoices.find(v =>
+                    v.lang.includes('en-US') || v.lang.includes('en-GB') || v.lang.includes('en')
+                );
+
+                const russianVoice = availableVoices.find(v =>
+                    v.lang.includes('ru-RU') || v.lang.includes('ru')
+                );
+
+                voicesRef.current = {
+                    english: englishVoice || availableVoices[0],
+                    russian: russianVoice || availableVoices[0]
+                };
+                setVoicesLoaded(true);
+            }
+        };
+
+        loadVoices();
+
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        return () => {
+            window.speechSynthesis.cancel();
+        };
+    }, []);
+
+    // Эффект для управления скоростью при включении/выключении озвучки
+    useEffect(() => {
+        const anyVoiceEnabled = speakEnglish || speakRussian;
+
+        if (anyVoiceEnabled) {
+            // Если озвучка только что включилась (была false, стала true)
+            if (!wasAnyVoiceEnabled.current) {
+                console.log('🔊 Озвучка включена - ставим скорость на минимум');
+                setSpeed(0.05); // Минимальная скорость
+            }
+            wasAnyVoiceEnabled.current = true;
+        } else {
+            // Если озвучка только что выключилась (была true, стала false)
+            if (wasAnyVoiceEnabled.current) {
+                console.log('🔇 Озвучка выключена - возвращаем скорость:', userSpeed);
+                setSpeed(userSpeed); // Возвращаем пользовательскую скорость
+            }
+            wasAnyVoiceEnabled.current = false;
+        }
+    }, [speakEnglish, speakRussian, userSpeed]);
+
+    // Делаем функцию озвучки доступной глобально для таблицы
+    useEffect(() => {
+        window.speakWord = (text: string, lang: 'en' | 'ru') => {
+            speak(text, lang);
+        };
+
+        return () => {
+            delete window.speakWord;
+        };
+    }, [speak]);
 
     // Эффект для автопоказа
     useEffect(() => {
@@ -259,6 +302,17 @@ function App() {
         };
     }, [currentIndex, isPlaying, speed, speakCurrentWord, studyWords.length]);
 
+    // ============================================
+    // ПЕРЕМЕННЫЕ
+    // ============================================
+
+    // Текущее слово
+    const currentWord = studyWords[currentIndex];
+
+    // ============================================
+    // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    // ============================================
+
     // Выделение слова в предложении
     const highlightWordInSentence = (sentence: string, word: string, lang: 'en' | 'ru' = 'en') => {
         if (!highlightWords || !sentence || !word) return sentence;
@@ -273,7 +327,9 @@ function App() {
         });
     };
 
-    const currentWord = studyWords[currentIndex];
+    // ============================================
+    // РАЗМЕТКА JSX
+    // ============================================
 
     return (
         <div className="app">
@@ -325,7 +381,7 @@ function App() {
                                 <div className="word-with-speak">
                                     {showEnglish && (
                                         <>
-                                            <button onClick={speakManually} className="speak-word-btn" title="Озвучить слово">
+                                            <button onClick={speakEnglishManually} className="speak-word-btn" title="Озвучить английское слово">
                                                 🔊
                                             </button>
                                             <div className="english-word">{currentWord.word}</div>
@@ -339,6 +395,7 @@ function App() {
                                     </div>
                                 )}
 
+                                {/* Русское слово без кнопки озвучки */}
                                 {showRussian && (
                                     <div className="russian-word-container">
                                         <div className="russian-word">{currentWord.translation}</div>
@@ -508,7 +565,7 @@ function App() {
                                     <input
                                         type="range"
                                         min="0.2"
-                                        max="5"
+                                        max="3"
                                         step="0.1"
                                         value={russianSpeechRate}
                                         onChange={(e) => setRussianSpeechRate(Number(e.target.value))}

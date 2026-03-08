@@ -2,6 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { wordTable, WordRow } from '../data/wordTable';
 import './WordTable.css';
 
+// Функция для озвучивания слова (передадим из App)
+declare global {
+    interface Window {
+        speakWord?: (text: string, lang: 'en' | 'ru') => void;
+    }
+}
+
 const WordTable: React.FC = () => {
     const [words, setWords] = useState<WordRow[]>([]);
     const [filterFamily, setFilterFamily] = useState<string>('all');
@@ -116,7 +123,7 @@ const WordTable: React.FC = () => {
         setShowResetConfirm(false);
     };
 
-    // Импорт файла
+    // Импорт JSON файла
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
@@ -124,24 +131,24 @@ const WordTable: React.FC = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             const content = e.target?.result as string;
-            const success = wordTable.importFromCSV(content);
+            const success = wordTable.importFromJSON(content);
             if (success) {
                 loadData();
-                alert('✅ Файл успешно загружен!');
+                alert('✅ JSON файл успешно загружен!');
             } else {
-                alert('❌ Ошибка загрузки файла. Проверьте формат.');
+                alert('❌ Ошибка загрузки файла. Проверьте формат JSON.');
             }
         };
         reader.readAsText(file);
     };
 
-    // Скачать пример шаблона
+    // Скачать пример шаблона JSON
     const downloadTemplate = () => {
-        const template = wordTable.getCSVTemplate();
-        const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
+        const template = wordTable.getImportTemplate();
+        const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'word_template.csv';
+        link.download = 'word_template.json';
         link.click();
     };
 
@@ -160,6 +167,15 @@ const WordTable: React.FC = () => {
         });
     };
 
+    // Функция озвучивания
+    const handleSpeak = (text: string, lang: 'en' | 'ru') => {
+        if (window.speakWord) {
+            window.speakWord(text, lang);
+        } else {
+            console.log('Функция озвучки не доступна');
+        }
+    };
+
     const filteredWords = getFilteredWords();
 
     // Статистика по семействам
@@ -172,57 +188,147 @@ const WordTable: React.FC = () => {
     }));
 
     // Мобильное отображение карточки слова
-    const renderMobileWordCard = (word: WordRow) => (
-        <div
-            key={word.id}
-            className={`mobile-word-card ${word.learned ? 'card-learned' : ''} ${word.blacklisted ? 'card-blacklisted' : ''}`}
-        >
-            <div className="mobile-card-header">
-                <span className="mobile-word-id">#{word.id}</span>
-                <div className="mobile-card-actions">
-                    <button onClick={() => startEditing(word)} className="mobile-action-btn edit-btn" title="Редактировать">✏️</button>
-                    <button onClick={() => handleToggleLearned(word.id)} className={`mobile-action-btn ${word.learned ? 'active' : ''}`} title="Выучено">
-                        {word.learned ? '✅' : '⬜'}
-                    </button>
-                    <button onClick={() => handleToggleBlacklist(word.id)} className={`mobile-action-btn ${word.blacklisted ? 'active' : ''}`} title="Черный список">
-                        {word.blacklisted ? '⛔' : '🚫'}
-                    </button>
-                </div>
-            </div>
+    const renderMobileWordCard = (word: WordRow) => {
+        const isEditing = editingId === word.id;
 
-            <div className="mobile-word-main">
-                <div className="mobile-word-row">
-                    <span className="mobile-label">Слово:</span>
-                    <span className="mobile-word">{word.word}</span>
-                </div>
-                <div className="mobile-word-row">
-                    <span className="mobile-label">Транскрипция:</span>
-                    <span className="mobile-transcription">{word.transcription}</span>
-                </div>
-                <div className="mobile-word-row">
-                    <span className="mobile-label">Перевод:</span>
-                    <span className="mobile-translation">{word.translation}</span>
-                </div>
-                <div className="mobile-word-row">
-                    <span className="mobile-label">Часть речи:</span>
-                    <span className="mobile-pos">{word.partOfSpeech}</span>
-                </div>
-                <div className="mobile-word-row">
-                    <span className="mobile-label">Семейство:</span>
-                    <span className="mobile-family">{word.rootFamily}</span>
-                </div>
-            </div>
+        if (isEditing) {
+            return (
+                <div key={word.id} className="mobile-word-card editing">
+                    <div className="mobile-card-header">
+                        <span className="mobile-word-id">#{word.id} (редактирование)</span>
+                        <div className="mobile-card-actions">
+                            <button onClick={() => saveEditing(word.id)} className="mobile-action-btn save" title="Сохранить">💾</button>
+                            <button onClick={cancelEditing} className="mobile-action-btn cancel" title="Отмена">✖️</button>
+                        </div>
+                    </div>
 
-            <div className="mobile-examples">
-                <div className="mobile-example-en">
-                    {highlightWordInExample(word.example, word.word, 'en')}
+                    <div className="mobile-edit-form">
+                        <div className="mobile-edit-row">
+                            <label>Слово:</label>
+                            <input
+                                value={editForm.word || ''}
+                                onChange={(e) => handleEditChange('word', e.target.value)}
+                                className="mobile-edit-input"
+                            />
+                        </div>
+                        <div className="mobile-edit-row">
+                            <label>Транскрипция:</label>
+                            <input
+                                value={editForm.transcription || ''}
+                                onChange={(e) => handleEditChange('transcription', e.target.value)}
+                                className="mobile-edit-input"
+                            />
+                        </div>
+                        <div className="mobile-edit-row">
+                            <label>Перевод:</label>
+                            <input
+                                value={editForm.translation || ''}
+                                onChange={(e) => handleEditChange('translation', e.target.value)}
+                                className="mobile-edit-input"
+                            />
+                        </div>
+                        <div className="mobile-edit-row">
+                            <label>Часть речи:</label>
+                            <select
+                                value={editForm.partOfSpeech || ''}
+                                onChange={(e) => handleEditChange('partOfSpeech', e.target.value)}
+                                className="mobile-edit-select"
+                            >
+                                <option>глагол</option>
+                                <option>сущ.</option>
+                                <option>прил.</option>
+                                <option>наречие</option>
+                            </select>
+                        </div>
+                        <div className="mobile-edit-row">
+                            <label>Семейство:</label>
+                            <select
+                                value={editForm.rootFamily || ''}
+                                onChange={(e) => handleEditChange('rootFamily', e.target.value)}
+                                className="mobile-edit-select"
+                            >
+                                {families.map(f => (
+                                    <option key={f} value={f}>{f}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="mobile-edit-row">
+                            <label>Пример (en):</label>
+                            <textarea
+                                value={editForm.example || ''}
+                                onChange={(e) => handleEditChange('example', e.target.value)}
+                                className="mobile-edit-textarea"
+                                rows={2}
+                            />
+                        </div>
+                        <div className="mobile-edit-row">
+                            <label>Пример (ru):</label>
+                            <textarea
+                                value={editForm.exampleTranslation || ''}
+                                onChange={(e) => handleEditChange('exampleTranslation', e.target.value)}
+                                className="mobile-edit-textarea"
+                                rows={2}
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div className="mobile-example-ru">
-                    {highlightWordInExample(word.exampleTranslation, word.translation, 'ru')}
+            );
+        }
+
+        return (
+            <div
+                key={word.id}
+                className={`mobile-word-card ${word.learned ? 'card-learned' : ''} ${word.blacklisted ? 'card-blacklisted' : ''}`}
+            >
+                <div className="mobile-card-header">
+                    <span className="mobile-word-id">#{word.id}</span>
+                    <div className="mobile-card-actions">
+                        <button onClick={() => handleSpeak(word.word, 'en')} className="mobile-action-btn speak" title="Озвучить английское">🔊</button>
+                        <button onClick={() => handleSpeak(word.translation, 'ru')} className="mobile-action-btn speak" title="Озвучить русское">🗣️</button>
+                        <button onClick={() => startEditing(word)} className="mobile-action-btn edit" title="Редактировать">✏️</button>
+                        <button onClick={() => handleToggleLearned(word.id)} className={`mobile-action-btn ${word.learned ? 'active' : ''}`} title="Выучено">
+                            {word.learned ? '✅' : '⬜'}
+                        </button>
+                        <button onClick={() => handleToggleBlacklist(word.id)} className={`mobile-action-btn ${word.blacklisted ? 'active' : ''}`} title="Черный список">
+                            {word.blacklisted ? '⛔' : '🚫'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="mobile-word-main">
+                    <div className="mobile-word-row">
+                        <span className="mobile-label">Слово:</span>
+                        <span className="mobile-word">{word.word}</span>
+                    </div>
+                    <div className="mobile-word-row">
+                        <span className="mobile-label">Транскрипция:</span>
+                        <span className="mobile-transcription">{word.transcription}</span>
+                    </div>
+                    <div className="mobile-word-row">
+                        <span className="mobile-label">Перевод:</span>
+                        <span className="mobile-translation">{word.translation}</span>
+                    </div>
+                    <div className="mobile-word-row">
+                        <span className="mobile-label">Часть речи:</span>
+                        <span className="mobile-pos">{word.partOfSpeech}</span>
+                    </div>
+                    <div className="mobile-word-row">
+                        <span className="mobile-label">Семейство:</span>
+                        <span className="mobile-family">{word.rootFamily}</span>
+                    </div>
+                </div>
+
+                <div className="mobile-examples">
+                    <div className="mobile-example-en">
+                        {highlightWordInExample(word.example, word.word, 'en')}
+                    </div>
+                    <div className="mobile-example-ru">
+                        {highlightWordInExample(word.exampleTranslation, word.translation, 'ru')}
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="word-table-container">
@@ -340,6 +446,8 @@ const WordTable: React.FC = () => {
                                 <td className="id-cell">{word.id}</td>
 
                                 <td className="actions-cell">
+                                    <button onClick={() => handleSpeak(word.word, 'en')} className="action-btn" title="Озвучить английское">🔊</button>
+                                    <button onClick={() => handleSpeak(word.translation, 'ru')} className="action-btn" title="Озвучить русское">🗣️</button>
                                     {editingId === word.id ? (
                                         <>
                                             <button onClick={() => saveEditing(word.id)} className="action-btn save" title="Сохранить">💾</button>
@@ -440,22 +548,22 @@ const WordTable: React.FC = () => {
                         type="file"
                         ref={fileInputRef}
                         onChange={handleFileUpload}
-                        accept=".csv,.txt"
+                        accept=".json"
                         style={{ display: 'none' }}
                     />
                     <button
                         onClick={() => fileInputRef.current?.click()}
                         className="btn-upload"
-                        title="Загрузить файл со словами"
+                        title="Загрузить JSON файл со словами"
                     >
-                        📂 Загрузить CSV
+                        📂 Загрузить JSON
                     </button>
                     <button
                         onClick={downloadTemplate}
                         className="btn-template"
-                        title="Скачать пример шаблона"
+                        title="Скачать пример шаблона JSON"
                     >
-                        📥 Шаблон CSV
+                        📥 Шаблон JSON
                     </button>
                 </div>
 
