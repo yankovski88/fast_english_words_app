@@ -58,5 +58,335 @@
     "example": "The laughing children enjoyed the party.",
     "exampleTranslation": "Смеющиеся дети наслаждались вечеринкой.",
     "rootFamily": "laugh"
+  },
+  {
+    "id": 375,
+    "word": "like",
+    "transcription": "/laɪk/",
+    "translation": "нравиться",
+    "partOfSpeech": "глагол",
+    "example": "I like the way you arranged the flowers.",
+    "exampleTranslation": "Мне нравится, как ты расставил цветы.",
+    "rootFamily": "like"
+  },
+  {
+    "id": 376,
+    "word": "neglect",
+    "transcription": "/nɪˈɡlekt/",
+    "translation": "пренебрегать",
+    "partOfSpeech": "глагол",
+    "example": "Don't neglect your duties; submit your work on time.",
+    "exampleTranslation": "Не пренебрегай своими обязанностями; сдавай работу вовремя.",
+    "rootFamily": "neglect"
+  },
+  {
+    "id": 377,
+    "word": "neglected",
+    "transcription": "/nɪˈɡlek.tɪd/",
+    "translation": "запущенный",
+    "partOfSpeech": "прил.",
+    "example": "The neglected garden required care.",
+    "exampleTranslation": "Запущенный сад требовал ухода.",
+    "rootFamily": "neglect"
+  },
+  {
+    "id": 378,
+    "word": "happy",
+    "transcription": "/ˈhæpi/",
+    "translation": "счастливый",
+    "partOfSpeech": "прил.",
+    "example": "She is happy with her new job.",
+    "exampleTranslation": "Она счастлива на новой работе.",
+    "rootFamily": "happy"
+  },
+  {
+    "id": 379,
+    "word": "happiness",
+    "transcription": "/ˈhæp.i.nəs/",
+    "translation": "счастье",
+    "partOfSpeech": "сущ.",
+    "example": "Happiness is more important than money.",
+    "exampleTranslation": "Счастье важнее денег.",
+    "rootFamily": "happy"
+  },
+  {
+    "id": 380,
+    "word": "unhappy",
+    "transcription": "/ʌnˈhæp.i/",
+    "translation": "несчастливый",
+    "partOfSpeech": "прил.",
+    "example": "He was unhappy with the result.",
+    "exampleTranslation": "Он был недоволен результатом.",
+    "rootFamily": "happy"
+  },
+  {
+    "id": 381,
+    "word": "happily",
+    "transcription": "/ˈhæp.ɪ.li/",
+    "translation": "счастливо",
+    "partOfSpeech": "наречие",
+    "example": "They lived happily ever after.",
+    "exampleTranslation": "Они жили долго и счастливо.",
+    "rootFamily": "happy"
+  },
+  {
+    "id": 390,
+    "word": "laughter",
+    "transcription": "/ˈlæf.tər/",
+    "translation": "смех",
+    "partOfSpeech": "сущ.",
+    "example": "Laughter is the best medicine.",
+    "exampleTranslation": "Смех - лучшее лекарство.",
+    "rootFamily": "laugh"
+  },
+  {
+    "id": 391,
+    "word": "laughed",
+    "transcription": "/læft/",
+    "translation": "смеялся",
+    "partOfSpeech": "глагол (прош.)",
+    "example": "He laughed at the joke.",
+    "exampleTranslation": "Он смеялся над шуткой.",
+    "rootFamily": "laugh"
+  },
+  {
+    "id": 392,
+    "word": "like",
+    "transcription": "/laɪk/",
+    "translation": "как, подобно",
+    "partOfSpeech": "предлог",
+    "example": "She sings like a professional.",
+    "exampleTranslation": "Она поет как профессионал.",
+    "rootFamily": "like"
+  },
+  {
+    "id": 393,
+    "word": "likely",
+    "transcription": "/ˈlaɪ.kli/",
+    "translation": "вероятно",
+    "partOfSpeech": "наречие",
+    "example": "It will likely rain tomorrow.",
+    "exampleTranslation": "Завтра, вероятно, будет дождь.",
+    "rootFamily": "like"
+  },
+  {
+    "id": 394,
+    "word": "unlike",
+    "transcription": "/ʌnˈlaɪk/",
+    "translation": "в отличие от",
+    "partOfSpeech": "предлог",
+    "example": "Unlike his brother, he is very tall.",
+    "exampleTranslation": "В отличие от брата, он очень высокий.",
+    "rootFamily": "like"
+  },
+  {
+    "id": 395,
+    "word": "negligence",
+    "transcription": "/ˈneɡ.lɪ.dʒəns/",
+    "translation": "халатность",
+    "partOfSpeech": "сущ.",
+    "example": "The accident was caused by negligence.",
+    "exampleTranslation": "Авария была вызвана халатностью.",
+    "rootFamily": "neglect"
+  },
+  {
+    "id": 396,
+    "word": "negligent",
+    "transcription": "/ˈneɡ.lɪ.dʒənt/",
+    "translation": "небрежный",
+    "partOfSpeech": "прил.",
+    "example": "He was negligent in his duties.",
+    "exampleTranslation": "Он был небрежен в своих обязанностях.",
+    "rootFamily": "neglect"
+  },
+  {
+    "id": 397,
+    "word": "sad",
+    "transcription": "/sæd/",
+    "translation": "грустный",
+    "partOfSpeech": "прил.",
+    "example": "The movie had a sad ending.",
+    "exampleTranslation": "У фильма был грустный конец.",
+    "rootFamily": "sad"
+  },
+  {
+    "id": 398,
+    "word": "sadness",
+    "transcription": "/ˈsæd.nəs/",
+    "translation": "грусть",
+    "partOfSpeech": "сущ.",
+    "example": "She felt a deep sadness.",
+    "exampleTranslation": "Она чувствовала глубокую грусть.",
+    "rootFamily": "sad"
+  },
+  {
+    "id": 399,
+    "word": "sadly",
+    "transcription": "/ˈsæd.li/",
+    "translation": "грустно",
+    "partOfSpeech": "наречие",
+    "example": "He sadly shook his head.",
+    "exampleTranslation": "Он грустно покачал головой.",
+    "rootFamily": "sad"
+  },
+  {
+    "id": 400,
+    "word": "big",
+    "transcription": "/bɪɡ/",
+    "translation": "большой",
+    "partOfSpeech": "прил.",
+    "example": "They have a big house.",
+    "exampleTranslation": "У них большой дом.",
+    "rootFamily": "big"
+  },
+  {
+    "id": 401,
+    "word": "bigger",
+    "transcription": "/ˈbɪɡ.ər/",
+    "translation": "больше",
+    "partOfSpeech": "прил. (сравн.)",
+    "example": "My car is bigger than yours.",
+    "exampleTranslation": "Моя машина больше твоей.",
+    "rootFamily": "big"
+  },
+  {
+    "id": 402,
+    "word": "biggest",
+    "transcription": "/ˈbɪɡ.əst/",
+    "translation": "самый большой",
+    "partOfSpeech": "прил. (превосх.)",
+    "example": "This is the biggest cake I've ever seen.",
+    "exampleTranslation": "Это самый большой торт, который я когда-либо видел.",
+    "rootFamily": "big"
+  },
+  {
+    "id": 403,
+    "word": "small",
+    "transcription": "/smɔːl/",
+    "translation": "маленький",
+    "partOfSpeech": "прил.",
+    "example": "She has a small cat.",
+    "exampleTranslation": "У нее маленькая кошка.",
+    "rootFamily": "small"
+  },
+  {
+    "id": 404,
+    "word": "smaller",
+    "transcription": "/ˈsmɔː.lər/",
+    "translation": "меньше",
+    "partOfSpeech": "прил. (сравн.)",
+    "example": "This bag is smaller than that one.",
+    "exampleTranslation": "Эта сумка меньше той.",
+    "rootFamily": "small"
+  },
+  {
+    "id": 405,
+    "word": "smallest",
+    "transcription": "/ˈsmɔː.ləst/",
+    "translation": "самый маленький",
+    "partOfSpeech": "прил. (превосх.)",
+    "example": "This is the smallest phone.",
+    "exampleTranslation": "Это самый маленький телефон.",
+    "rootFamily": "small"
+  },
+  {
+    "id": 406,
+    "word": "hot",
+    "transcription": "/hɒt/",
+    "translation": "горячий",
+    "partOfSpeech": "прил.",
+    "example": "The soup is very hot.",
+    "exampleTranslation": "Суп очень горячий.",
+    "rootFamily": "hot"
+  },
+  {
+    "id": 407,
+    "word": "hotter",
+    "transcription": "/ˈhɒt.ər/",
+    "translation": "горячее",
+    "partOfSpeech": "прил. (сравн.)",
+    "example": "Today is hotter than yesterday.",
+    "exampleTranslation": "Сегодня жарче, чем вчера.",
+    "rootFamily": "hot"
+  },
+  {
+    "id": 408,
+    "word": "hottest",
+    "transcription": "/ˈhɒt.əst/",
+    "translation": "самый горячий",
+    "partOfSpeech": "прил. (превосх.)",
+    "example": "July is the hottest month.",
+    "exampleTranslation": "Июль - самый жаркий месяц.",
+    "rootFamily": "hot"
+  },
+  {
+    "id": 409,
+    "word": "cold",
+    "transcription": "/koʊld/",
+    "translation": "холодный",
+    "partOfSpeech": "прил.",
+    "example": "The water is cold.",
+    "exampleTranslation": "Вода холодная.",
+    "rootFamily": "cold"
+  },
+  {
+    "id": 410,
+    "word": "colder",
+    "transcription": "/ˈkoʊl.dər/",
+    "translation": "холоднее",
+    "partOfSpeech": "прил. (сравн.)",
+    "example": "Winter is colder than autumn.",
+    "exampleTranslation": "Зима холоднее осени.",
+    "rootFamily": "cold"
+  },
+  {
+    "id": 411,
+    "word": "coldest",
+    "transcription": "/ˈkoʊl.dəst/",
+    "translation": "самый холодный",
+    "partOfSpeech": "прил. (превосх.)",
+    "example": "This is the coldest day of the year.",
+    "exampleTranslation": "Это самый холодный день в году.",
+    "rootFamily": "cold"
+  },
+  {
+    "id": 412,
+    "word": "run",
+    "transcription": "/rʌn/",
+    "translation": "бежать",
+    "partOfSpeech": "глагол",
+    "example": "I run every morning.",
+    "exampleTranslation": "Я бегаю каждое утро.",
+    "rootFamily": "run"
+  },
+  {
+    "id": 413,
+    "word": "runner",
+    "transcription": "/ˈrʌn.ər/",
+    "translation": "бегун",
+    "partOfSpeech": "сущ.",
+    "example": "She is a fast runner.",
+    "exampleTranslation": "Она быстрая бегунья.",
+    "rootFamily": "run"
+  },
+  {
+    "id": 414,
+    "word": "running",
+    "transcription": "/ˈrʌn.ɪŋ/",
+    "translation": "бег",
+    "partOfSpeech": "сущ.",
+    "example": "Running is good exercise.",
+    "exampleTranslation": "Бег - хорошее упражнение.",
+    "rootFamily": "run"
+  },
+  {
+    "id": 415,
+    "word": "ran",
+    "transcription": "/ræn/",
+    "translation": "бежал",
+    "partOfSpeech": "глагол (прош.)",
+    "example": "He ran to the store.",
+    "exampleTranslation": "Он побежал в магазин.",
+    "rootFamily": "run"
   }
 ]
