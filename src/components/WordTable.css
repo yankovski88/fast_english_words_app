@@ -1,0 +1,818 @@
+/* ============================================
+   ПОЛНЫЙ ФАЙЛ СТИЛЕЙ ДЛЯ КОМПОНЕНТА ТАБЛИЦЫ
+   ============================================ */
+
+/* Основной контейнер таблицы */
+.word-table-container {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 20px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   ЗАГОЛОВОК И ЭЛЕМЕНТЫ УПРАВЛЕНИЯ
+   ============================================ */
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.table-header h2 {
+    color: #2d3748;
+    font-size: 24px;
+    margin: 0;
+}
+
+.table-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   ПОИСК
+   ============================================ */
+
+.search-box {
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 25px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: white;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-input::placeholder {
+    color: #a0aec0;
+}
+
+/* ============================================
+   ГРУППА ФИЛЬТРОВ
+   ============================================ */
+
+.filter-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    background: #f7fafc;
+    padding: 10px 15px;
+    border-radius: 12px;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #4a5568;
+    cursor: pointer;
+    min-width: 150px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.filter-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.checkbox-label-text {
+    user-select: none;
+}
+
+/* ============================================
+   КНОПКА СБРОСА
+   ============================================ */
+
+.btn-reset {
+    padding: 8px 16px;
+    background: #f56565;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-reset:hover {
+    background: #e53e3e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+}
+
+.btn-reset:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   ПРОГРЕСС ПО СЕМЕЙСТВАМ
+   ============================================ */
+
+.families-progress {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.families-progress h4 {
+    margin: 0 0 10px 0;
+    color: #4a5568;
+    font-size: 16px;
+}
+
+.family-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.family-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.family-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.family-badge.family-complete {
+    background: #f0fff4;
+    border-color: #48bb78;
+}
+
+.family-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.family-progress {
+    background: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: #4a5568;
+}
+
+.family-complete .family-progress {
+    background: #48bb78;
+    color: white;
+}
+
+.family-blacklist {
+    background: #fc8181;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 11px;
+}
+
+/* ============================================
+   ОБЕРТКА ТАБЛИЦЫ (СКРОЛЛ)
+   ============================================ */
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* ============================================
+   ОСНОВНАЯ ТАБЛИЦА
+   ============================================ */
+
+.word-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 1200px;
+}
+
+.word-table th {
+    background: #f7fafc;
+    color: #4a5568;
+    font-weight: 600;
+    padding: 15px 12px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.word-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.word-table tbody tr:hover {
+    background: #f7fafc;
+}
+
+/* ============================================
+   СТАТУСЫ СТРОК
+   ============================================ */
+
+.row-selected {
+    background: #ebf8ff;
+}
+
+.row-learned {
+    background: #f0fff4;
+}
+
+.row-blacklisted {
+    background: #fff5f5;
+}
+
+.row-learned:hover,
+.row-blacklisted:hover,
+.row-selected:hover {
+    filter: brightness(0.98);
+}
+
+/* ============================================
+   ЯЧЕЙКИ ТАБЛИЦЫ
+   ============================================ */
+
+.id-cell {
+    color: #718096;
+    font-weight: 500;
+    width: 50px;
+}
+
+.actions-cell {
+    width: 80px;
+    white-space: nowrap;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.action-btn.edit:hover {
+    background: #e2e8f0;
+    transform: scale(1.1);
+}
+
+.action-btn.save {
+    color: #48bb78;
+}
+
+.action-btn.save:hover {
+    background: #f0fff4;
+    transform: scale(1.1);
+}
+
+.action-btn.cancel {
+    color: #f56565;
+}
+
+.action-btn.cancel:hover {
+    background: #fff5f5;
+    transform: scale(1.1);
+}
+
+.word-cell {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.transcription-cell {
+    color: #718096;
+    font-family: 'Courier New', monospace;
+}
+
+.translation-cell {
+    color: #4a5568;
+}
+
+.pos-cell {
+    color: #9f7aea;
+    font-weight: 500;
+}
+
+.family-cell {
+    color: #667eea;
+    font-weight: 500;
+}
+
+.example-cell {
+    max-width: 300px;
+}
+
+.example-en {
+    color: #2d3748;
+    margin-bottom: 6px;
+    padding: 6px 10px;
+    background: #ebf8ff;
+    border-radius: 6px;
+    font-size: 13px;
+    border-left: 3px solid #4299e1;
+}
+
+.example-ru {
+    color: #4a5568;
+    padding: 6px 10px;
+    background: #f0f5fa;
+    border-radius: 6px;
+    font-size: 13px;
+    border-left: 3px solid #9f7aea;
+}
+
+/* ============================================
+   ЧЕКБОКСЫ
+   ============================================ */
+
+.checkbox-cell {
+    text-align: center;
+    width: 50px;
+}
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.checkbox-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkbox-custom {
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #cbd5e0;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.checkbox-label input[type="checkbox"]:checked ~ .checkbox-custom {
+    background-color: #48bb78;
+    border-color: #48bb78;
+}
+
+.checkbox-label input[type="checkbox"]:checked ~ .checkbox-custom::after {
+    content: "✓";
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.checkbox-label input[type="checkbox"]:disabled ~ .checkbox-custom {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #e2e8f0;
+}
+
+/* ============================================
+   ЭЛЕМЕНТЫ РЕДАКТИРОВАНИЯ
+   ============================================ */
+
+.edit-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.edit-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.edit-select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 13px;
+    background: white;
+}
+
+.edit-select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.edit-textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 12px;
+    resize: vertical;
+    margin-bottom: 4px;
+    font-family: inherit;
+}
+
+.edit-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ============================================
+   СТАТИСТИКА ВНИЗУ ТАБЛИЦЫ
+   ============================================ */
+
+.table-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+    margin-top: 20px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.stat-label {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
+   ============================================ */
+
+@media (max-width: 768px) {
+    .word-table-container {
+        padding: 15px;
+    }
+
+    .table-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .table-controls {
+        flex-direction: column;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .filter-checkbox {
+        justify-content: flex-start;
+    }
+
+    .family-badges {
+        justify-content: center;
+    }
+
+    .table-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .stat-item {
+        padding: 8px;
+    }
+
+    .stat-value {
+        font-size: 18px;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 480px) {
+    .table-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .family-badge {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .example-cell {
+        max-width: 200px;
+    }
+}
+
+/* ============================================
+   СКРОЛЛБАР ДЛЯ ТАБЛИЦЫ
+   ============================================ */
+
+.table-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* ============================================
+   АНИМАЦИИ
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.word-table-container {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* ============================================
+   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ УЛУЧШЕНИЯ ВИДА
+   ============================================ */
+
+/* Подсветка при наведении на строку */
+.word-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+/* Стили для иконок в действиях */
+.action-btn {
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* Улучшенный вид для примеров */
+.example-en, .example-ru {
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+/* Стили для пустого состояния */
+.no-words-message {
+    text-align: center;
+    padding: 40px;
+    color: #a0aec0;
+    font-size: 16px;
+}
+
+/* Индикатор загрузки */
+.loading-spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Группа загрузки файлов */
+.file-upload-group {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-upload {
+    padding: 8px 12px;
+    background: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-upload:hover {
+    background: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+.btn-template {
+    padding: 8px 12px;
+    background: #9f7aea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-template:hover {
+    background: #805ad5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(159, 122, 234, 0.3);
+}
+
+/* Группа сброса с подтверждением */
+.reset-group {
+    position: relative;
+    display: inline-block;
+}
+
+.reset-confirm {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 100;
+    animation: slideDown 0.2s ease-out;
+}
+
+.reset-confirm span {
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.confirm-yes {
+    padding: 4px 8px;
+    background: #48bb78;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.confirm-yes:hover {
+    background: #38a169;
+    transform: scale(1.1);
+}
+
+.confirm-no {
+    padding: 4px 8px;
+    background: #f56565;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.confirm-no:hover {
+    background: #e53e3e;
+    transform: scale(1.1);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .file-upload-group {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .btn-upload,
+    .btn-template {
+        width: 100%;
+    }
+
+    .reset-confirm {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 300px;
+        justify-content: center;
+    }
+}

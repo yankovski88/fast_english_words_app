@@ -1,0 +1,62 @@
+[
+  {
+    "id": 369,
+    "word": "hope",
+    "transcription": "/hoʊp/",
+    "translation": "надеяться",
+    "partOfSpeech": "глагол",
+    "example": "I hope we can overcome this struggle together.",
+    "exampleTranslation": "Я надеюсь, мы сможем преодолеть эту борьбу вместе.",
+    "rootFamily": "hope"
+  },
+  {
+    "id": 370,
+    "word": "hope",
+    "transcription": "/hoʊp/",
+    "translation": "надежда",
+    "partOfSpeech": "сущ.",
+    "example": "There is always hope even in the darkest times.",
+    "exampleTranslation": "Всегда есть надежда даже в самые темные времена.",
+    "rootFamily": "hope"
+  },
+  {
+    "id": 371,
+    "word": "hopeful",
+    "transcription": "/ˈhoʊp.fəl/",
+    "translation": "надеющийся",
+    "partOfSpeech": "прил.",
+    "example": "He was hopeful that he could overcome the struggle.",
+    "exampleTranslation": "Он надеялся, что сможет преодолеть борьбу.",
+    "rootFamily": "hope"
+  },
+  {
+    "id": 372,
+    "word": "hopeless",
+    "transcription": "/ˈhoʊp.ləs/",
+    "translation": "безнадёжный",
+    "partOfSpeech": "прил.",
+    "example": "The situation seemed hopeless, but they persisted.",
+    "exampleTranslation": "Ситуация казалась безнадежной, но они упорствовали.",
+    "rootFamily": "hope"
+  },
+  {
+    "id": 373,
+    "word": "laugh",
+    "transcription": "/læf/",
+    "translation": "смеяться",
+    "partOfSpeech": "глагол",
+    "example": "We all laughed at his pointed joke.",
+    "exampleTranslation": "Мы все смеялись над его остроумной шуткой.",
+    "rootFamily": "laugh"
+  },
+  {
+    "id": 374,
+    "word": "laughing",
+    "transcription": "/ˈlæf.ɪŋ/",
+    "translation": "смеющийся",
+    "partOfSpeech": "прил.",
+    "example": "The laughing children enjoyed the party.",
+    "exampleTranslation": "Смеющиеся дети наслаждались вечеринкой.",
+    "rootFamily": "laugh"
+  }
+]
