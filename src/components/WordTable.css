@@ -1,8 +1,7 @@
 /* ============================================
-   ПОЛНЫЙ ФАЙЛ СТИЛЕЙ ДЛЯ КОМПОНЕНТА ТАБЛИЦЫ
+   ОСНОВНЫЕ СТИЛИ ТАБЛИЦЫ
    ============================================ */
 
-/* Основной контейнер таблицы */
 .word-table-container {
     background: white;
     border-radius: 20px;
@@ -10,10 +9,6 @@
     margin: 20px 0;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
-
-/* ============================================
-   ЗАГОЛОВОК И ЭЛЕМЕНТЫ УПРАВЛЕНИЯ
-   ============================================ */
 
 .table-header {
     display: flex;
@@ -62,12 +57,8 @@
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.search-input::placeholder {
-    color: #a0aec0;
-}
-
 /* ============================================
-   ГРУППА ФИЛЬТРОВ
+   ФИЛЬТРЫ
    ============================================ */
 
 .filter-group {
@@ -103,6 +94,7 @@
     cursor: pointer;
     font-size: 14px;
     color: #4a5568;
+    white-space: nowrap;
 }
 
 .filter-checkbox input[type="checkbox"] {
@@ -111,38 +103,8 @@
     cursor: pointer;
 }
 
-.checkbox-label-text {
-    user-select: none;
-}
-
 /* ============================================
-   КНОПКА СБРОСА
-   ============================================ */
-
-.btn-reset {
-    padding: 8px 16px;
-    background: #f56565;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.btn-reset:hover {
-    background: #e53e3e;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
-}
-
-.btn-reset:active {
-    transform: translateY(0);
-}
-
-/* ============================================
-   ПРОГРЕСС ПО СЕМЕЙСТВАМ
+   ПРОГРЕСС ПО СЕМЕЙСТВАМ - АДАПТИВНЫЙ
    ============================================ */
 
 .families-progress {
@@ -152,10 +114,38 @@
     margin-bottom: 20px;
 }
 
-.families-progress h4 {
-    margin: 0 0 10px 0;
+.families-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.families-header h4 {
+    margin: 0;
     color: #4a5568;
     font-size: 16px;
+}
+
+.families-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #667eea;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.families-toggle-btn:hover {
+    background: #e2e8f0;
+    color: #764ba2;
 }
 
 .family-badges {
@@ -165,7 +155,7 @@
 }
 
 .family-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
@@ -175,6 +165,8 @@
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
+    flex: 0 1 auto;
+    min-width: fit-content;
 }
 
 .family-badge:hover {
@@ -199,6 +191,7 @@
     border-radius: 12px;
     font-size: 11px;
     color: #4a5568;
+    white-space: nowrap;
 }
 
 .family-complete .family-progress {
@@ -212,10 +205,11 @@
     padding: 2px 6px;
     border-radius: 12px;
     font-size: 11px;
+    white-space: nowrap;
 }
 
 /* ============================================
-   ОБЕРТКА ТАБЛИЦЫ (СКРОЛЛ)
+   ТАБЛИЦА
    ============================================ */
 
 .table-wrapper {
@@ -225,17 +219,14 @@
     margin-bottom: 20px;
     max-height: 500px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
-
-/* ============================================
-   ОСНОВНАЯ ТАБЛИЦА
-   ============================================ */
 
 .word-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    min-width: 1200px;
+    min-width: 1000px;
 }
 
 .word-table th {
@@ -265,10 +256,6 @@
    СТАТУСЫ СТРОК
    ============================================ */
 
-.row-selected {
-    background: #ebf8ff;
-}
-
 .row-learned {
     background: #f0fff4;
 }
@@ -277,14 +264,8 @@
     background: #fff5f5;
 }
 
-.row-learned:hover,
-.row-blacklisted:hover,
-.row-selected:hover {
-    filter: brightness(0.98);
-}
-
 /* ============================================
-   ЯЧЕЙКИ ТАБЛИЦЫ
+   ЯЧЕЙКИ
    ============================================ */
 
 .id-cell {
@@ -319,7 +300,6 @@
 
 .action-btn.save:hover {
     background: #f0fff4;
-    transform: scale(1.1);
 }
 
 .action-btn.cancel {
@@ -328,7 +308,6 @@
 
 .action-btn.cancel:hover {
     background: #fff5f5;
-    transform: scale(1.1);
 }
 
 .word-cell {
@@ -367,6 +346,7 @@
     border-radius: 6px;
     font-size: 13px;
     border-left: 3px solid #4299e1;
+    line-height: 1.5;
 }
 
 .example-ru {
@@ -376,6 +356,26 @@
     border-radius: 6px;
     font-size: 13px;
     border-left: 3px solid #9f7aea;
+    line-height: 1.5;
+}
+
+/* Выделение слов в примерах */
+.example-highlight {
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.example-highlight-en {
+    background: #ffeb3b;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(255, 235, 59, 0.3);
+}
+
+.example-highlight-ru {
+    background: #9f7aea;
+    color: white;
+    box-shadow: 0 2px 5px rgba(159, 122, 234, 0.3);
 }
 
 /* ============================================
@@ -426,75 +426,142 @@
     line-height: 1;
 }
 
-.checkbox-label input[type="checkbox"]:disabled ~ .checkbox-custom {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: #e2e8f0;
+/* ============================================
+   КНОПКИ УПРАВЛЕНИЯ ФАЙЛАМИ
+   ============================================ */
+
+.file-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.file-upload-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-upload,
+.btn-template,
+.btn-reset {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-upload {
+    background: #4299e1;
+    color: white;
+}
+
+.btn-upload:hover {
+    background: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+.btn-template {
+    background: #9f7aea;
+    color: white;
+}
+
+.btn-template:hover {
+    background: #805ad5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(159, 122, 234, 0.3);
+}
+
+.btn-reset {
+    background: #f56565;
+    color: white;
+}
+
+.btn-reset:hover {
+    background: #e53e3e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
 }
 
 /* ============================================
-   ЭЛЕМЕНТЫ РЕДАКТИРОВАНИЯ
+   ПОДТВЕРЖДЕНИЕ СБРОСА
    ============================================ */
 
-.edit-input {
-    width: 100%;
-    padding: 6px 8px;
+.reset-group {
+    position: relative;
+}
+
+.reset-confirm {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    padding: 12px;
+    background: white;
     border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+    animation: slideDown 0.2s ease-out;
+    white-space: nowrap;
+}
+
+.reset-confirm span {
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.confirm-yes,
+.confirm-no {
+    padding: 6px 12px;
+    border: none;
     border-radius: 4px;
-    font-size: 13px;
+    cursor: pointer;
+    font-size: 14px;
     transition: all 0.2s;
 }
 
-.edit-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+.confirm-yes {
+    background: #48bb78;
+    color: white;
 }
 
-.edit-select {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    font-size: 13px;
-    background: white;
+.confirm-yes:hover {
+    background: #38a169;
 }
 
-.edit-select:focus {
-    outline: none;
-    border-color: #667eea;
+.confirm-no {
+    background: #f56565;
+    color: white;
 }
 
-.edit-textarea {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    font-size: 12px;
-    resize: vertical;
-    margin-bottom: 4px;
-    font-family: inherit;
-}
-
-.edit-textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+.confirm-no:hover {
+    background: #e53e3e;
 }
 
 /* ============================================
-   СТАТИСТИКА ВНИЗУ ТАБЛИЦЫ
+   СТАТИСТИКА
    ============================================ */
 
 .table-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
     padding: 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 12px;
     color: white;
-    margin-top: 20px;
 }
 
 .stat-item {
@@ -525,263 +592,8 @@
 }
 
 /* ============================================
-   АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
-   ============================================ */
-
-@media (max-width: 768px) {
-    .word-table-container {
-        padding: 15px;
-    }
-
-    .table-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .table-controls {
-        flex-direction: column;
-    }
-
-    .search-box {
-        width: 100%;
-    }
-
-    .filter-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .filter-select {
-        width: 100%;
-    }
-
-    .filter-checkbox {
-        justify-content: flex-start;
-    }
-
-    .family-badges {
-        justify-content: center;
-    }
-
-    .table-stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        padding: 15px;
-    }
-
-    .stat-item {
-        padding: 8px;
-    }
-
-    .stat-value {
-        font-size: 18px;
-    }
-}
-
-/* Для очень маленьких экранов */
-@media (max-width: 480px) {
-    .table-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .family-badge {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .example-cell {
-        max-width: 200px;
-    }
-}
-
-/* ============================================
-   СКРОЛЛБАР ДЛЯ ТАБЛИЦЫ
-   ============================================ */
-
-.table-wrapper::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-.table-wrapper::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb {
-    background: #cbd5e0;
-    border-radius: 4px;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb:hover {
-    background: #a0aec0;
-}
-
-/* ============================================
    АНИМАЦИИ
    ============================================ */
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.word-table-container {
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* ============================================
-   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ УЛУЧШЕНИЯ ВИДА
-   ============================================ */
-
-/* Подсветка при наведении на строку */
-.word-table tbody tr {
-    transition: background-color 0.2s;
-}
-
-/* Стили для иконок в действиях */
-.action-btn {
-    font-size: 18px;
-    line-height: 1;
-}
-
-/* Улучшенный вид для примеров */
-.example-en, .example-ru {
-    word-break: break-word;
-    line-height: 1.4;
-}
-
-/* Стили для пустого состояния */
-.no-words-message {
-    text-align: center;
-    padding: 40px;
-    color: #a0aec0;
-    font-size: 16px;
-}
-
-/* Индикатор загрузки */
-.loading-spinner {
-    display: inline-block;
-    width: 30px;
-    height: 30px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Группа загрузки файлов */
-.file-upload-group {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-upload {
-    padding: 8px 12px;
-    background: #4299e1;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.btn-upload:hover {
-    background: #3182ce;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
-}
-
-.btn-template {
-    padding: 8px 12px;
-    background: #9f7aea;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.btn-template:hover {
-    background: #805ad5;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(159, 122, 234, 0.3);
-}
-
-/* Группа сброса с подтверждением */
-.reset-group {
-    position: relative;
-    display: inline-block;
-}
-
-.reset-confirm {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 5px;
-    padding: 8px 12px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 100;
-    animation: slideDown 0.2s ease-out;
-}
-
-.reset-confirm span {
-    color: #4a5568;
-    font-size: 14px;
-}
-
-.confirm-yes {
-    padding: 4px 8px;
-    background: #48bb78;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-}
-
-.confirm-yes:hover {
-    background: #38a169;
-    transform: scale(1.1);
-}
-
-.confirm-no {
-    padding: 4px 8px;
-    background: #f56565;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-}
-
-.confirm-no:hover {
-    background: #e53e3e;
-    transform: scale(1.1);
-}
 
 @keyframes slideDown {
     from {
@@ -794,16 +606,99 @@
     }
 }
 
-/* Адаптивность */
+/* ============================================
+   АДАПТИВНОСТЬ - ОСНОВНАЯ
+   ============================================ */
+
+@media (max-width: 1200px) {
+    .word-table-container {
+        padding: 20px;
+    }
+
+    .family-badges {
+        gap: 8px;
+    }
+
+    .family-badge {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 992px) {
+    .table-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .table-header h2 {
+        text-align: center;
+    }
+
+    .table-controls {
+        flex-direction: column;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .filter-group {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .family-badges {
+        justify-content: center;
+    }
+}
+
 @media (max-width: 768px) {
+    .word-table-container {
+        padding: 15px;
+    }
+
+    .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    .filter-checkbox {
+        justify-content: flex-start;
+        padding: 5px 0;
+    }
+
+    .family-badges {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 8px;
+    }
+
+    .family-badge {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .file-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .file-upload-group {
         width: 100%;
         flex-direction: column;
     }
 
     .btn-upload,
-    .btn-template {
+    .btn-template,
+    .btn-reset {
         width: 100%;
+        text-align: center;
     }
 
     .reset-confirm {
@@ -814,5 +709,87 @@
         width: 90%;
         max-width: 300px;
         justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .table-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .stat-item {
+        padding: 10px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .word-table-container {
+        padding: 10px;
+    }
+
+    .table-header h2 {
+        font-size: 20px;
+    }
+
+    .family-badges {
+        grid-template-columns: 1fr;
+    }
+
+    .family-badge {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .table-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .example-en,
+    .example-ru {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+
+    .example-highlight {
+        padding: 1px 3px;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 360px) {
+    .word-table {
+        min-width: 800px; /* Уменьшаем минимальную ширину для очень маленьких */
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: 2px;
+    }
+
+    .action-btn {
+        padding: 2px 4px;
+        font-size: 14px;
+    }
+}
+
+/* Улучшенная читаемость на мобильных */
+@media (hover: none) and (pointer: coarse) {
+    .family-badge:hover {
+        transform: none;
+    }
+
+    .btn-upload:hover,
+    .btn-template:hover,
+    .btn-reset:hover {
+        transform: none;
+    }
+
+    .stat-item:hover {
+        transform: none;
     }
 }

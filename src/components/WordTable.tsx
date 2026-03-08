@@ -11,6 +11,7 @@ const WordTable: React.FC = () => {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editForm, setEditForm] = useState<Partial<WordRow>>({});
     const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [showFamiliesProgress, setShowFamiliesProgress] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -115,16 +116,12 @@ const WordTable: React.FC = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             const content = e.target?.result as string;
-            try {
-                const imported = JSON.parse(content);
-                if (Array.isArray(imported)) {
-                    // Здесь нужно добавить метод импорта в wordTable
-                    alert('✅ Файл успешно загружен!');
-                } else {
-                    alert('❌ Ошибка: неверный формат JSON');
-                }
-            } catch (error) {
-                alert('❌ Ошибка парсинга JSON');
+            const success = wordTable.importFromCSV(content);
+            if (success) {
+                loadData();
+                alert('✅ Файл успешно загружен!');
+            } else {
+                alert('❌ Ошибка загрузки файла. Проверьте формат.');
             }
         };
         reader.readAsText(file);
@@ -132,23 +129,27 @@ const WordTable: React.FC = () => {
 
     // Скачать пример шаблона
     const downloadTemplate = () => {
-        const template = [
-            {
-                id: 1,
-                word: "example",
-                transcription: "/ɪɡˈzæmpəl/",
-                translation: "пример",
-                partOfSpeech: "сущ.",
-                example: "This is an example.",
-                exampleTranslation: "Это пример.",
-                rootFamily: "example"
-            }
-        ];
-        const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+        const template = wordTable.getCSVTemplate();
+        const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'words_template.json';
+        link.download = 'word_template.csv';
         link.click();
+    };
+
+    // Функция для выделения слова в предложении
+    const highlightWordInExample = (text: string, word: string, lang: 'en' | 'ru') => {
+        if (!text || !word) return text;
+
+        const regex = new RegExp(`(${word})`, 'gi');
+        const parts = text.split(regex);
+
+        return parts.map((part, i) => {
+            if (part.toLowerCase() === word.toLowerCase()) {
+                return <mark key={i} className={`example-highlight example-highlight-${lang}`}>{part}</mark>;
+            }
+            return part;
+        });
     };
 
     const filteredWords = getFilteredWords();
@@ -211,69 +212,45 @@ const WordTable: React.FC = () => {
                             />
                             <span className="checkbox-label-text">⛔ Показать черный список</span>
                         </label>
-
-                        <div className="file-upload-group">
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleFileUpload}
-                                accept=".json"
-                                style={{ display: 'none' }}
-                            />
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="btn-upload"
-                                title="Загрузить JSON файл со словами"
-                            >
-                                📂 Загрузить JSON
-                            </button>
-                            <button
-                                onClick={downloadTemplate}
-                                className="btn-template"
-                                title="Скачать пример шаблона"
-                            >
-                                📥 Шаблон JSON
-                            </button>
-                        </div>
-
-                        <div className="reset-group">
-                            <button onClick={handleResetClick} className="btn-reset" title="Сбросить к начальному списку слов">
-                                🔄 Сброс
-                            </button>
-
-                            {showResetConfirm && (
-                                <div className="reset-confirm">
-                                    <span>Сбросить все слова к начальным?</span>
-                                    <button onClick={confirmReset} className="confirm-yes">✅ Да</button>
-                                    <button onClick={cancelReset} className="confirm-no">❌ Нет</button>
-                                </div>
-                            )}
-                        </div>
                     </div>
                 </div>
             </div>
 
+            {/* Прогресс по семействам с кнопкой сворачивания */}
             <div className="families-progress">
-                <h4>📊 Прогресс по семействам:</h4>
-                <div className="family-badges">
-                    {familyStats.map(family => (
-                        <div
-                            key={family.name}
-                            className={`family-badge ${family.fullyLearned ? 'family-complete' : ''}`}
-                            onClick={() => setFilterFamily(family.name)}
-                        >
-                            <span className="family-name">{family.name}</span>
-                            <span className="family-progress">
-                {family.learned}/{family.total}
-              </span>
-                            {family.blacklisted > 0 && (
-                                <span className="family-blacklist" title="В черном списке">
-                  ⛔ {family.blacklisted}
-                </span>
-                            )}
-                        </div>
-                    ))}
+                <div className="families-header">
+                    <h4>📊 Прогресс по семействам</h4>
+                    <button
+                        onClick={() => setShowFamiliesProgress(!showFamiliesProgress)}
+                        className="families-toggle-btn"
+                    >
+                        {showFamiliesProgress ? '−' : '+'}
+                    </button>
                 </div>
+
+                {showFamiliesProgress && (
+                    <div className="families-content">
+                        <div className="family-badges">
+                            {familyStats.map(family => (
+                                <div
+                                    key={family.name}
+                                    className={`family-badge ${family.fullyLearned ? 'family-complete' : ''}`}
+                                    onClick={() => setFilterFamily(family.name)}
+                                >
+                                    <span className="family-name">{family.name}</span>
+                                    <span className="family-progress">
+                    {family.learned}/{family.total}
+                  </span>
+                                    {family.blacklisted > 0 && (
+                                        <span className="family-blacklist" title="В черном списке">
+                      ⛔ {family.blacklisted}
+                    </span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="table-wrapper">
@@ -348,8 +325,12 @@ const WordTable: React.FC = () => {
                                     <td className="translation-cell">{word.translation}</td>
                                     <td className="pos-cell">{word.partOfSpeech}</td>
                                     <td className="example-cell">
-                                        <div className="example-en">📘 {word.example}</div>
-                                        <div className="example-ru">📙 {word.exampleTranslation}</div>
+                                        <div className="example-en">
+                                            {highlightWordInExample(word.example, word.word, 'en')}
+                                        </div>
+                                        <div className="example-ru">
+                                            {highlightWordInExample(word.exampleTranslation, word.translation, 'ru')}
+                                        </div>
                                     </td>
                                     <td className="family-cell">{word.rootFamily}</td>
                                 </>
@@ -382,26 +363,64 @@ const WordTable: React.FC = () => {
                 </table>
             </div>
 
+            {/* Кнопки управления файлами */}
+            <div className="file-actions">
+                <div className="file-upload-group">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileUpload}
+                        accept=".csv,.txt"
+                        style={{ display: 'none' }}
+                    />
+                    <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="btn-upload"
+                        title="Загрузить файл со словами"
+                    >
+                        📂 Загрузить CSV
+                    </button>
+                    <button
+                        onClick={downloadTemplate}
+                        className="btn-template"
+                        title="Скачать пример шаблона"
+                    >
+                        📥 Шаблон CSV
+                    </button>
+                </div>
+
+                <div className="reset-group">
+                    <button onClick={handleResetClick} className="btn-reset" title="Сбросить к начальному списку слов">
+                        🔄 Сброс
+                    </button>
+
+                    {showResetConfirm && (
+                        <div className="reset-confirm">
+                            <span>Сбросить все слова?</span>
+                            <button onClick={confirmReset} className="confirm-yes">✅ Да</button>
+                            <button onClick={cancelReset} className="confirm-no">❌ Нет</button>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Статистика */}
             <div className="table-stats">
                 <div className="stat-item">
-                    <span className="stat-label">📊 Всего слов:</span>
+                    <span className="stat-label">📊 Всего:</span>
                     <span className="stat-value">{words.length}</span>
                 </div>
                 <div className="stat-item">
-                    <span className="stat-label">✅ Выучено семейств:</span>
-                    <span className="stat-value">{familyStats.filter(f => f.fullyLearned).length}</span>
+                    <span className="stat-label">✅ Выучено:</span>
+                    <span className="stat-value">{words.filter(w => w.learned).length}</span>
                 </div>
                 <div className="stat-item">
                     <span className="stat-label">📚 В процессе:</span>
                     <span className="stat-value">{words.filter(w => !w.learned && !w.blacklisted).length}</span>
                 </div>
                 <div className="stat-item">
-                    <span className="stat-label">⛔ В черном списке:</span>
+                    <span className="stat-label">⛔ ЧС:</span>
                     <span className="stat-value">{words.filter(w => w.blacklisted).length}</span>
-                </div>
-                <div className="stat-item">
-                    <span className="stat-label">✅ Выучено слов:</span>
-                    <span className="stat-value">{words.filter(w => w.learned).length}</span>
                 </div>
             </div>
         </div>

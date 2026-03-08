@@ -388,5 +388,55 @@
     "example": "He ran to the store.",
     "exampleTranslation": "Он побежал в магазин.",
     "rootFamily": "run"
+  },
+  {
+    "id": 403,
+    "word": "small",
+    "transcription": "/smɔːl/",
+    "translation": "маленький",
+    "partOfSpeech": "прил.",
+    "example": "She has a small cat.",
+    "exampleTranslation": "У нее маленькая кошка.",
+    "rootFamily": "small"
+  },
+  {
+    "id": 404,
+    "word": "smaller",
+    "transcription": "/ˈsmɔː.lər/",
+    "translation": "меньше",
+    "partOfSpeech": "прил. (сравн.)",
+    "example": "This bag is smaller than that one.",
+    "exampleTranslation": "Эта сумка меньше той.",
+    "rootFamily": "small"
+  },
+  {
+    "id": 405,
+    "word": "smallest",
+    "transcription": "/ˈsmɔː.ləst/",
+    "translation": "самый маленький",
+    "partOfSpeech": "прил. (превосх.)",
+    "example": "This is the smallest phone.",
+    "exampleTranslation": "Это самый маленький телефон.",
+    "rootFamily": "small"
+  },
+  {
+    "id": 406,
+    "word": "hot",
+    "transcription": "/hɒt/",
+    "translation": "горячий",
+    "partOfSpeech": "прил.",
+    "example": "The soup is very hot.",
+    "exampleTranslation": "Суп очень горячий.",
+    "rootFamily": "hot"
+  },
+  {
+    "id": 407,
+    "word": "hotter",
+    "transcription": "/ˈhɒt.ər/",
+    "translation": "горячее",
+    "partOfSpeech": "прил. (сравн.)",
+    "example": "Today is hotter than yesterday.",
+    "exampleTranslation": "Сегодня жарче, чем вчера.",
+    "rootFamily": "hot"
   }
 ]
