@@ -725,3 +725,404 @@
         transform: none;
     }
 }
+
+/* Управление семействами */
+.families-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    padding: 10px;
+    background: #f0f5fa;
+    border-radius: 8px;
+}
+
+.families-action-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.families-action-btn.select-all {
+    background: #48bb78;
+    color: white;
+}
+
+.families-action-btn.select-all:hover {
+    background: #38a169;
+}
+
+.families-action-btn.clear-all {
+    background: #f56565;
+    color: white;
+}
+
+.families-action-btn.clear-all:hover {
+    background: #e53e3e;
+}
+
+.families-action-btn.select-top {
+    background: #9f7aea;
+    color: white;
+}
+
+.families-action-btn.select-top:hover {
+    background: #805ad5;
+}
+
+.family-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 0 1 auto;
+    min-width: fit-content;
+}
+
+.family-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.family-badge.family-selected {
+    background: #e6f7ff;
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+.family-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.family-badge.family-complete {
+    background: #f0fff4;
+    border-color: #48bb78;
+}
+
+.family-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.family-progress {
+    background: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: #4a5568;
+    white-space: nowrap;
+}
+
+.family-complete .family-progress {
+    background: #48bb78;
+    color: white;
+}
+
+.family-blacklist {
+    background: #fc8181;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.selected-count {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #f0f5fa;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #4a5568;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .families-actions {
+        flex-direction: column;
+    }
+
+    .families-action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .family-badge {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Добавьте к существующим стилям */
+
+.families-action-btn.remove-top {
+    background: #fc8181;
+    color: white;
+}
+
+.families-action-btn.remove-top:hover {
+    background: #f56565;
+}
+
+.families-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    padding: 10px;
+    background: #f0f5fa;
+    border-radius: 8px;
+}
+
+.families-action-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.families-action-btn.select-all {
+    background: #48bb78;
+    color: white;
+}
+
+.families-action-btn.select-all:hover {
+    background: #38a169;
+}
+
+.families-action-btn.clear-all {
+    background: #f56565;
+    color: white;
+}
+
+.families-action-btn.clear-all:hover {
+    background: #e53e3e;
+}
+
+.families-action-btn.select-top {
+    background: #9f7aea;
+    color: white;
+}
+
+.families-action-btn.select-top:hover {
+    background: #805ad5;
+}
+
+.family-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 0 1 auto;
+    min-width: fit-content;
+}
+
+.family-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.family-badge.family-selected {
+    background: #e6f7ff;
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+.family-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.family-badge.family-complete {
+    background: #f0fff4;
+    border-color: #48bb78;
+}
+
+.family-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.family-progress {
+    background: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: #4a5568;
+    white-space: nowrap;
+}
+
+.family-complete .family-progress {
+    background: #48bb78;
+    color: white;
+}
+
+.family-blacklist {
+    background: #fc8181;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.selected-count {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #f0f5fa;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #4a5568;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .families-actions {
+        flex-direction: column;
+    }
+
+    .families-action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .family-badge {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Секция семейств с кнопкой сворачивания */
+.families-section {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.families-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.families-section-header h4 {
+    margin: 0;
+    color: #4a5568;
+    font-size: 16px;
+}
+
+.families-section-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #667eea;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.families-section-toggle-btn:hover {
+    background: #e2e8f0;
+    color: #764ba2;
+}
+
+.families-section-content {
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Обновленные цвета для строк */
+.row-learned {
+    background: #e6ffe6 !important;
+    border-left: 4px solid #48bb78;
+}
+
+.row-blacklisted {
+    background: #ffe6e6 !important;
+    border-left: 4px solid #f56565;
+}
+
+.row-learned:hover {
+    background: #d4ffd4 !important;
+}
+
+.row-blacklisted:hover {
+    background: #ffd4d4 !important;
+}
+
+/* Обновленные цвета для мобильных карточек */
+.card-learned {
+    background: #e6ffe6 !important;
+    border-left: 4px solid #48bb78;
+}
+
+.card-blacklisted {
+    background: #ffe6e6 !important;
+    border-left: 4px solid #f56565;
+}
+
+/* Кнопки фильтров */
+.filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: all 0.2s;
+}
+
+.filter-checkbox:hover {
+    background: #e2e8f0;
+}
+
+.filter-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}

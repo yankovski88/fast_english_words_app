@@ -1,13 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { wordTable, WordRow } from '../data/wordTable';
+import { useFamilyContext } from '../context/FamilyContext';
 import './WordTable.css';
-
-// Функция для озвучивания слова (передадим из App)
-declare global {
-    interface Window {
-        speakWord?: (text: string, lang: 'en' | 'ru') => void;
-    }
-}
 
 const WordTable: React.FC = () => {
     const [words, setWords] = useState<WordRow[]>([]);
@@ -19,8 +13,21 @@ const WordTable: React.FC = () => {
     const [editForm, setEditForm] = useState<Partial<WordRow>>({});
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [showFamiliesProgress, setShowFamiliesProgress] = useState(true);
+    const [showFamiliesSection, setShowFamiliesSection] = useState(true);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Используем контекст
+    const {
+        selectedFamilies,
+        families,
+        toggleFamilySelection,
+        selectAllFamilies,
+        clearAllFamilies,
+        selectTopFamilies,
+        removeTopFamilies,
+        refreshStudyWords
+    } = useFamilyContext();
 
     useEffect(() => {
         const handleResize = () => {
@@ -39,12 +46,14 @@ const WordTable: React.FC = () => {
         setWords(allWords);
     };
 
-    // Получить уникальные семейства
-    const families = [...new Set(words.map(w => w.rootFamily))].sort();
-
-    // Фильтрация слов
+    // Фильтрация слов с учетом выбранных семейств
     const getFilteredWords = () => {
         let filtered = [...words];
+
+        // Фильтр по выбранным семействам
+        if (selectedFamilies.size > 0) {
+            filtered = filtered.filter(w => selectedFamilies.has(w.rootFamily));
+        }
 
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
@@ -79,11 +88,13 @@ const WordTable: React.FC = () => {
     const handleToggleLearned = (id: number) => {
         wordTable.toggleWordLearned(id);
         loadData();
+        refreshStudyWords();
     };
 
     const handleToggleBlacklist = (id: number) => {
         wordTable.toggleWordBlacklist(id);
         loadData();
+        refreshStudyWords();
     };
 
     // Редактирование
@@ -102,6 +113,7 @@ const WordTable: React.FC = () => {
         setEditingId(null);
         setEditForm({});
         loadData();
+        refreshStudyWords();
     };
 
     const handleEditChange = (field: keyof WordRow, value: string | boolean) => {
@@ -116,6 +128,7 @@ const WordTable: React.FC = () => {
     const confirmReset = () => {
         wordTable.resetToDefault();
         loadData();
+        refreshStudyWords();
         setShowResetConfirm(false);
     };
 
@@ -134,6 +147,7 @@ const WordTable: React.FC = () => {
             const success = wordTable.importFromJSON(content);
             if (success) {
                 loadData();
+                refreshStudyWords();
                 alert('✅ JSON файл успешно загружен!');
             } else {
                 alert('❌ Ошибка загрузки файла. Проверьте формат JSON.');
@@ -167,15 +181,6 @@ const WordTable: React.FC = () => {
         });
     };
 
-    // Функция озвучивания
-    const handleSpeak = (text: string, lang: 'en' | 'ru') => {
-        if (window.speakWord) {
-            window.speakWord(text, lang);
-        } else {
-            console.log('Функция озвучки не доступна');
-        }
-    };
-
     const filteredWords = getFilteredWords();
 
     // Статистика по семействам
@@ -184,7 +189,8 @@ const WordTable: React.FC = () => {
         total: words.filter(w => w.rootFamily === family).length,
         learned: words.filter(w => w.rootFamily === family && w.learned).length,
         blacklisted: words.filter(w => w.rootFamily === family && w.blacklisted).length,
-        fullyLearned: isFamilyFullyLearned(family)
+        fullyLearned: isFamilyFullyLearned(family),
+        selected: selectedFamilies.has(family)
     }));
 
     // Мобильное отображение карточки слова
@@ -330,6 +336,13 @@ const WordTable: React.FC = () => {
         );
     };
 
+    // Функция для озвучивания (будет доступна из глобального объекта)
+    const handleSpeak = (text: string, lang: 'en' | 'ru') => {
+        if (window.speakWord) {
+            window.speakWord(text, lang);
+        }
+    };
+
     return (
         <div className="word-table-container">
             <div className="table-header">
@@ -366,7 +379,7 @@ const WordTable: React.FC = () => {
                                 checked={showLearned}
                                 onChange={(e) => setShowLearned(e.target.checked)}
                             />
-                            <span>✅ Выученные</span>
+                            <span>✅ Показать выученные</span>
                         </label>
 
                         <label className="filter-checkbox">
@@ -375,16 +388,82 @@ const WordTable: React.FC = () => {
                                 checked={showBlacklisted}
                                 onChange={(e) => setShowBlacklisted(e.target.checked)}
                             />
-                            <span>⛔ Черный список</span>
+                            <span>⛔ Показать черный список</span>
                         </label>
                     </div>
                 </div>
             </div>
 
-            {/* Прогресс по семействам */}
-            <div className="families-progress">
+            {/* Секция семейств с кнопкой сворачивания */}
+            <div className="families-section">
+                <div className="families-section-header">
+                    <h4>📊 Семейства слов</h4>
+                    <button
+                        onClick={() => setShowFamiliesSection(!showFamiliesSection)}
+                        className="families-section-toggle-btn"
+                    >
+                        {showFamiliesSection ? '−' : '+'}
+                    </button>
+                </div>
+
+                {showFamiliesSection && (
+                    <div className="families-section-content">
+                        <div className="families-actions">
+                            <button onClick={selectAllFamilies} className="families-action-btn select-all">
+                                ✅ Выбрать все
+                            </button>
+                            <button onClick={clearAllFamilies} className="families-action-btn clear-all">
+                                ❌ Очистить все
+                            </button>
+                            <button onClick={() => selectTopFamilies(10)} className="families-action-btn select-top">
+                                🔟 Выбрать 10
+                            </button>
+                            <button onClick={() => removeTopFamilies(10)} className="families-action-btn remove-top">
+                                🔟 Убрать 10
+                            </button>
+                            <button onClick={() => selectTopFamilies(20)} className="families-action-btn select-top">
+                                2️⃣0️⃣ Выбрать 20
+                            </button>
+                            <button onClick={() => removeTopFamilies(20)} className="families-action-btn remove-top">
+                                2️⃣0️⃣ Убрать 20
+                            </button>
+                        </div>
+
+                        <div className="family-badges">
+                            {familyStats.map(family => (
+                                <div
+                                    key={family.name}
+                                    className={`family-badge ${family.fullyLearned ? 'family-complete' : ''} ${family.selected ? 'family-selected' : ''}`}
+                                    onClick={() => toggleFamilySelection(family.name)}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={family.selected}
+                                        onChange={() => toggleFamilySelection(family.name)}
+                                        className="family-checkbox"
+                                        onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <span className="family-name">{family.name}</span>
+                                    <span className="family-progress">
+                    {family.learned}/{family.total}
+                  </span>
+                                    {family.blacklisted > 0 && (
+                                        <span className="family-blacklist">⛔ {family.blacklisted}</span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="selected-count">
+                            Выбрано семейств: {selectedFamilies.size} из {families.length}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Прогресс по семействам (старый блок, оставлен для совместимости) */}
+            <div className="families-progress" style={{ display: 'none' }}>
                 <div className="families-header">
-                    <h4>📊 Прогресс по семействам</h4>
+                    <h4>📊 Управление семействами</h4>
                     <button
                         onClick={() => setShowFamiliesProgress(!showFamiliesProgress)}
                         className="families-toggle-btn"
@@ -395,13 +474,41 @@ const WordTable: React.FC = () => {
 
                 {showFamiliesProgress && (
                     <div className="families-content">
+                        <div className="families-actions">
+                            <button onClick={selectAllFamilies} className="families-action-btn select-all">
+                                ✅ Выбрать все
+                            </button>
+                            <button onClick={clearAllFamilies} className="families-action-btn clear-all">
+                                ❌ Очистить все
+                            </button>
+                            <button onClick={() => selectTopFamilies(10)} className="families-action-btn select-top">
+                                🔟 Выбрать 10
+                            </button>
+                            <button onClick={() => removeTopFamilies(10)} className="families-action-btn remove-top">
+                                🔟 Убрать 10
+                            </button>
+                            <button onClick={() => selectTopFamilies(20)} className="families-action-btn select-top">
+                                2️⃣0️⃣ Выбрать 20
+                            </button>
+                            <button onClick={() => removeTopFamilies(20)} className="families-action-btn remove-top">
+                                2️⃣0️⃣ Убрать 20
+                            </button>
+                        </div>
+
                         <div className="family-badges">
                             {familyStats.map(family => (
                                 <div
                                     key={family.name}
-                                    className={`family-badge ${family.fullyLearned ? 'family-complete' : ''}`}
-                                    onClick={() => setFilterFamily(family.name)}
+                                    className={`family-badge ${family.fullyLearned ? 'family-complete' : ''} ${family.selected ? 'family-selected' : ''}`}
+                                    onClick={() => toggleFamilySelection(family.name)}
                                 >
+                                    <input
+                                        type="checkbox"
+                                        checked={family.selected}
+                                        onChange={() => toggleFamilySelection(family.name)}
+                                        className="family-checkbox"
+                                        onClick={(e) => e.stopPropagation()}
+                                    />
                                     <span className="family-name">{family.name}</span>
                                     <span className="family-progress">
                     {family.learned}/{family.total}
@@ -411,6 +518,9 @@ const WordTable: React.FC = () => {
                                     )}
                                 </div>
                             ))}
+                        </div>
+                        <div className="selected-count">
+                            Выбрано семейств: {selectedFamilies.size} из {families.length}
                         </div>
                     </div>
                 )}
@@ -594,11 +704,15 @@ const WordTable: React.FC = () => {
                 </div>
                 <div className="stat-item">
                     <span className="stat-label">📚 В процессе:</span>
-                    <span className="stat-value">{words.filter(w => !w.learned && !w.blacklisted).length}</span>
+                    <span className="stat-value">{words.filter(w => !w.learned && !w.blacklisted && selectedFamilies.has(w.rootFamily)).length}</span>
                 </div>
                 <div className="stat-item">
                     <span className="stat-label">⛔ ЧС:</span>
                     <span className="stat-value">{words.filter(w => w.blacklisted).length}</span>
+                </div>
+                <div className="stat-item">
+                    <span className="stat-label">🎯 Семейств:</span>
+                    <span className="stat-value">{selectedFamilies.size}/{families.length}</span>
                 </div>
             </div>
         </div>
