@@ -26,3 +26,12 @@ pnpm-debug.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Firebase secrets
+*.json
+!package.json
+!tsconfig.json
+!vite.config.json
+serviceAccountKey.json
+fast-english-words-app-firebase-adminsdk-*.json
+scripts/*.json
