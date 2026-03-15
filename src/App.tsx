@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
-import { wordTable } from './data/wordTable';
 import WordTable from './components/WordTable';
-import { WordRow } from './types/word.types';
 import { FamilyProvider, useFamilyContext } from './context/FamilyContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import AuthModal from './components/AuthModal';
 import WordCard from './components/WordCard';
 import NavigationControls from './components/NavigationControls';
 import DisplaySettings from './components/DisplaySettings';
@@ -22,6 +22,8 @@ const AppContent: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [showWordTable, setShowWordTable] = useState(false);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     // Состояния для отображения
     const [showEnglish, setShowEnglish] = useState(true);
@@ -60,18 +62,30 @@ const AppContent: React.FC = () => {
     const isProcessingRef = useRef(false);
     const wasAnyVoiceEnabled = useRef(false);
 
-    // Используем контекст семейств
-    const { studyWords, refreshStudyWords } = useFamilyContext();
+    // Используем контексты
+    const { user, logout } = useAuth();
+    const { studyWords, refreshStudyWords, toggleWordLearned } = useFamilyContext();
 
-    // Обновляем currentIndex при изменении списка слов
+    // Обновляем currentIndex при изменении списка слов с защитой
     useEffect(() => {
-        setCurrentIndex(0);
+        console.log('📚 studyWords изменился, длина:', studyWords.length);
+        if (studyWords.length > 0) {
+            // Проверяем, что currentIndex не выходит за пределы
+            setCurrentIndex(prev => {
+                if (prev >= studyWords.length) {
+                    return 0;
+                }
+                return prev;
+            });
+        }
+        setIsInitialized(true);
     }, [studyWords]);
 
     // Загрузка голосов
     useEffect(() => {
         const loadVoices = () => {
             const availableVoices = window.speechSynthesis.getVoices();
+            console.log('🎤 Доступные голоса:', availableVoices.length);
             if (availableVoices.length > 0) {
                 const englishVoice = availableVoices.find(v => v.lang.includes('en'));
                 const russianVoice = availableVoices.find(v => v.lang.includes('ru'));
@@ -79,6 +93,8 @@ const AppContent: React.FC = () => {
                     english: englishVoice || availableVoices[0],
                     russian: russianVoice || availableVoices[0]
                 };
+                console.log('🎤 Английский голос:', voicesRef.current.english?.name);
+                console.log('🎤 Русский голос:', voicesRef.current.russian?.name);
             }
         };
         loadVoices();
@@ -89,6 +105,8 @@ const AppContent: React.FC = () => {
     // Функция озвучивания
     const speak = useCallback((text: string, lang: 'en' | 'ru') => {
         return new Promise((resolve) => {
+            console.log(`🔊 Озвучиваем: "${text}" (${lang})`);
+
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = lang === 'en' ? 'en-US' : 'ru-RU';
             utterance.rate = lang === 'en' ? englishSpeechRate : russianSpeechRate;
@@ -99,12 +117,17 @@ const AppContent: React.FC = () => {
                 utterance.voice = voicesRef.current.russian;
             }
 
-            utterance.onstart = () => setIsSpeaking(true);
+            utterance.onstart = () => {
+                console.log('▶️ Речь началась');
+                setIsSpeaking(true);
+            };
             utterance.onend = () => {
+                console.log('⏹️ Речь закончилась');
                 setIsSpeaking(false);
                 resolve(true);
             };
-            utterance.onerror = () => {
+            utterance.onerror = (e) => {
+                console.error('❌ Ошибка речи:', e);
                 setIsSpeaking(false);
                 resolve(false);
             };
@@ -121,16 +144,22 @@ const AppContent: React.FC = () => {
 
     // Озвучивание текущего слова
     const speakCurrentWord = useCallback(async () => {
-        if (isProcessingRef.current || studyWords.length === 0) return;
+        if (isProcessingRef.current || studyWords.length === 0 || !studyWords[currentIndex]) return;
+
+        console.log('🔊 Озвучиваем слово индекс:', currentIndex);
         isProcessingRef.current = true;
         const word = studyWords[currentIndex];
 
         try {
-            if (speakEnglish) await speak(word.word, 'en');
+            if (speakEnglish) {
+                await speak(word.word, 'en');
+            }
             if (speakRussian) {
                 await new Promise(r => setTimeout(r, 300));
                 await speak(word.translation, 'ru');
             }
+        } catch (error) {
+            console.error('Ошибка озвучивания:', error);
         } finally {
             isProcessingRef.current = false;
         }
@@ -138,7 +167,7 @@ const AppContent: React.FC = () => {
 
     // Ручное озвучивание английского слова
     const speakEnglishManually = useCallback(() => {
-        if (studyWords.length === 0) return;
+        if (studyWords.length === 0 || !studyWords[currentIndex]) return;
         window.speechSynthesis.cancel();
         setIsSpeaking(false);
         isProcessingRef.current = false;
@@ -165,6 +194,7 @@ const AppContent: React.FC = () => {
         setIsSpeaking(false);
         isProcessingRef.current = false;
         setCurrentIndex(prev => (prev + 1) % studyWords.length);
+        console.log('➡️ Переход к следующему слову');
     }, [isPlaying, studyWords.length]);
 
     const goToPrevWord = useCallback(() => {
@@ -174,40 +204,55 @@ const AppContent: React.FC = () => {
         setIsSpeaking(false);
         isProcessingRef.current = false;
         setCurrentIndex(prev => (prev - 1 + studyWords.length) % studyWords.length);
+        console.log('⬅️ Переход к предыдущему слову');
     }, [isPlaying, studyWords.length]);
 
     // Отметить слово как выученное
-    const toggleLearned = useCallback(() => {
-        if (studyWords.length === 0) return;
+    const handleToggleLearned = useCallback(() => {
+        if (studyWords.length === 0 || !studyWords[currentIndex]) return;
         const word = studyWords[currentIndex];
-        wordTable.toggleWordLearned(word.id);
-        refreshStudyWords(); // Обновляем список после изменения
-    }, [currentIndex, studyWords, refreshStudyWords]);
+        toggleWordLearned(word.id);
+    }, [currentIndex, studyWords, toggleWordLearned]);
 
-    // Автопоказ
+    // ⭐ САМОЕ ВАЖНОЕ: Автопоказ
     useEffect(() => {
-        if (timerRef.current) clearTimeout(timerRef.current);
+        // Очищаем предыдущий таймер
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
+        }
+
+        // Если не играем или нет слов — выходим
         if (!isPlaying || studyWords.length === 0) {
-            window.speechSynthesis.cancel();
-            setIsSpeaking(false);
-            isProcessingRef.current = false;
+            console.log('⏸️ Автопоказ остановлен');
             return;
         }
 
-        let isActive = true;
-        const showWord = async () => {
-            if (!isActive || !isPlaying) return;
+        console.log('▶️ Автопоказ запущен, скорость:', speed, 'сек');
+
+        const runAutoPlay = async () => {
+            // Озвучиваем текущее слово
             await speakCurrentWord();
-            if (!isActive || !isPlaying) return;
-            timerRef.current = setTimeout(() => {
-                if (isActive && isPlaying) {
+
+            // Если всё ещё играем — ставим таймер на следующее слово
+            if (isPlaying && studyWords.length > 0) {
+                timerRef.current = setTimeout(() => {
+                    console.log('⏱️ Таймер сработал, переходим к следующему слову');
                     setCurrentIndex(prev => (prev + 1) % studyWords.length);
-                }
-            }, speed * 1000);
+                }, speed * 1000);
+            }
         };
-        showWord();
-        return () => { isActive = false; };
-    }, [currentIndex, isPlaying, speed, speakCurrentWord, studyWords.length]);
+
+        runAutoPlay();
+
+        // Очистка при размонтировании или остановке
+        return () => {
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+                timerRef.current = null;
+            }
+        };
+    }, [isPlaying, currentIndex, speed, studyWords.length, speakCurrentWord]);
 
     // Выделение слова в предложении
     const highlightWordInSentence = (sentence: string, word: string, lang: 'en' | 'ru' = 'en') => {
@@ -225,6 +270,21 @@ const AppContent: React.FC = () => {
     return (
         <div className="app">
             <h1>🇬🇧 Учим английские слова 🇷🇺</h1>
+
+            <div className="auth-buttons">
+                {user ? (
+                    <>
+                        <span className="user-email">{user.email}</span>
+                        <button onClick={logout} className="btn-logout">🚪 Выйти</button>
+                    </>
+                ) : (
+                    <button onClick={() => setShowAuthModal(true)} className="btn-login">
+                        🔐 Войти / Регистрация
+                    </button>
+                )}
+            </div>
+
+            <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
 
             <div className="table-toggle-container">
                 <button
@@ -244,20 +304,28 @@ const AppContent: React.FC = () => {
                 </div>
             ) : studyWords.length > 0 && !showWordTable ? (
                 <>
-                    <WordCard
-                        currentWord={currentWord}
-                        showEnglish={showEnglish}
-                        showTranscription={showTranscription}
-                        showRussian={showRussian}
-                        showSentenceEn={showSentenceEn}
-                        showSentenceRu={showSentenceRu}
-                        highlightWords={highlightWords}
-                        isSpeaking={isSpeaking}
-                        speakEnglish={speakEnglish}
-                        speakRussian={speakRussian}
-                        speakEnglishManually={speakEnglishManually}
-                        highlightWordInSentence={highlightWordInSentence}
-                    />
+                    {currentWord ? (
+                        <WordCard
+                            currentWord={currentWord}
+                            showEnglish={showEnglish}
+                            showTranscription={showTranscription}
+                            showRussian={showRussian}
+                            showSentenceEn={showSentenceEn}
+                            showSentenceRu={showSentenceRu}
+                            highlightWords={highlightWords}
+                            isSpeaking={isSpeaking}
+                            speakEnglish={speakEnglish}
+                            speakRussian={speakRussian}
+                            speakEnglishManually={speakEnglishManually}
+                            highlightWordInSentence={highlightWordInSentence}
+                        />
+                    ) : (
+                        <div className="word-card">
+                            <div className="placeholder-message">
+                                ⏳ Загрузка слова...
+                            </div>
+                        </div>
+                    )}
 
                     <div className="counter">
                         {currentIndex + 1} / {studyWords.length}
@@ -268,7 +336,7 @@ const AppContent: React.FC = () => {
                         goToNextWord={goToNextWord}
                         isPlaying={isPlaying}
                         setIsPlaying={setIsPlaying}
-                        toggleLearned={toggleLearned}
+                        toggleLearned={handleToggleLearned}
                         currentWordLearned={currentWord?.learned}
                     />
 
@@ -317,12 +385,13 @@ const AppContent: React.FC = () => {
     );
 };
 
-// Главный компонент с провайдером
 function App() {
     return (
-        <FamilyProvider>
-            <AppContent />
-        </FamilyProvider>
+        <AuthProvider>
+            <FamilyProvider>
+                <AppContent />
+            </FamilyProvider>
+        </AuthProvider>
     );
 }
 

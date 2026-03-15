@@ -2,7 +2,7 @@ import React from 'react';
 import { WordRow } from '../types/word.types';
 
 interface WordCardProps {
-    currentWord: WordRow;
+    currentWord: WordRow | undefined;
     showEnglish: boolean;
     showTranscription: boolean;
     showRussian: boolean;
@@ -23,13 +23,23 @@ const WordCard: React.FC<WordCardProps> = ({
                                                showRussian,
                                                showSentenceEn,
                                                showSentenceRu,
-                                               highlightWords,
                                                isSpeaking,
                                                speakEnglish,
                                                speakRussian,
                                                speakEnglishManually,
                                                highlightWordInSentence
                                            }) => {
+    // Защита от undefined
+    if (!currentWord) {
+        return (
+            <div className="word-card">
+                <div className="placeholder-message">
+                    ⏳ Загрузка слова...
+                </div>
+            </div>
+        );
+    }
+
     const nothingToShow = !showEnglish && !showTranscription && !showRussian &&
         !showSentenceEn && !showSentenceRu;
 

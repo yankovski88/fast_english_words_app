@@ -15,6 +15,7 @@ const WordTable: React.FC = () => {
     const [showFamiliesProgress, setShowFamiliesProgress] = useState(true);
     const [showFamiliesSection, setShowFamiliesSection] = useState(true);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [loading, setLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Используем контекст
@@ -40,32 +41,45 @@ const WordTable: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const loadData = () => {
-        const allWords = wordTable.getAllWords();
-        console.log('Загружено слов:', allWords.length);
-        setWords(allWords);
+    const loadData = async () => {
+        setLoading(true);
+        try {
+            const allWords = await wordTable.getAllWords();
+            console.log('Загружено слов:', allWords?.length || 0);
+            setWords(Array.isArray(allWords) ? allWords : []);
+        } catch (error) {
+            console.error('Ошибка загрузки слов:', error);
+            setWords([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Фильтрация слов с учетом выбранных семейств
     const getFilteredWords = () => {
+        // Защита от пустого массива
+        if (!words || !Array.isArray(words) || words.length === 0) {
+            return [];
+        }
+
         let filtered = [...words];
 
         // Фильтр по выбранным семействам
         if (selectedFamilies.size > 0) {
-            filtered = filtered.filter(w => selectedFamilies.has(w.rootFamily));
+            filtered = filtered.filter(w => w && w.rootFamily && selectedFamilies.has(w.rootFamily));
         }
 
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
             filtered = filtered.filter(w =>
-                w.rootFamily.toLowerCase().includes(term) ||
-                w.word.toLowerCase().includes(term) ||
-                w.translation.toLowerCase().includes(term)
+                (w.rootFamily && w.rootFamily.toLowerCase().includes(term)) ||
+                (w.word && w.word.toLowerCase().includes(term)) ||
+                (w.translation && w.translation.toLowerCase().includes(term))
             );
         }
 
         if (filterFamily !== 'all') {
-            filtered = filtered.filter(w => w.rootFamily === filterFamily);
+            filtered = filtered.filter(w => w && w.rootFamily === filterFamily);
         }
 
         if (!showLearned) {
@@ -81,19 +95,20 @@ const WordTable: React.FC = () => {
 
     // Проверка, все ли слова в семействе выучены
     const isFamilyFullyLearned = (family: string): boolean => {
-        const familyWords = words.filter(w => w.rootFamily === family);
+        if (!words || !Array.isArray(words) || words.length === 0) return false;
+        const familyWords = words.filter(w => w && w.rootFamily === family);
         return familyWords.length > 0 && familyWords.every(w => w.learned);
     };
 
-    const handleToggleLearned = (id: number) => {
+    const handleToggleLearned = async (id: number) => {
         wordTable.toggleWordLearned(id);
-        loadData();
+        await loadData();
         refreshStudyWords();
     };
 
-    const handleToggleBlacklist = (id: number) => {
+    const handleToggleBlacklist = async (id: number) => {
         wordTable.toggleWordBlacklist(id);
-        loadData();
+        await loadData();
         refreshStudyWords();
     };
 
@@ -108,11 +123,11 @@ const WordTable: React.FC = () => {
         setEditForm({});
     };
 
-    const saveEditing = (id: number) => {
+    const saveEditing = async (id: number) => {
         wordTable.editWord(id, editForm);
         setEditingId(null);
         setEditForm({});
-        loadData();
+        await loadData();
         refreshStudyWords();
     };
 
@@ -125,9 +140,9 @@ const WordTable: React.FC = () => {
         setShowResetConfirm(true);
     };
 
-    const confirmReset = () => {
+    const confirmReset = async () => {
         wordTable.resetToDefault();
-        loadData();
+        await loadData();
         refreshStudyWords();
         setShowResetConfirm(false);
     };
@@ -142,11 +157,11 @@ const WordTable: React.FC = () => {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             const content = e.target?.result as string;
             const success = wordTable.importFromJSON(content);
             if (success) {
-                loadData();
+                await loadData();
                 refreshStudyWords();
                 alert('✅ JSON файл успешно загружен!');
             } else {
@@ -174,7 +189,7 @@ const WordTable: React.FC = () => {
         const parts = text.split(regex);
 
         return parts.map((part, i) => {
-            if (part.toLowerCase() === word.toLowerCase()) {
+            if (part && part.toLowerCase() === word.toLowerCase()) {
                 return <mark key={i} className={`example-highlight example-highlight-${lang}`}>{part}</mark>;
             }
             return part;
@@ -182,19 +197,22 @@ const WordTable: React.FC = () => {
     };
 
     const filteredWords = getFilteredWords();
+    const hasWords = Array.isArray(filteredWords) && filteredWords.length > 0;
 
     // Статистика по семействам
     const familyStats = families.map(family => ({
         name: family,
-        total: words.filter(w => w.rootFamily === family).length,
-        learned: words.filter(w => w.rootFamily === family && w.learned).length,
-        blacklisted: words.filter(w => w.rootFamily === family && w.blacklisted).length,
+        total: words.filter(w => w && w.rootFamily === family).length,
+        learned: words.filter(w => w && w.rootFamily === family && w.learned).length,
+        blacklisted: words.filter(w => w && w.rootFamily === family && w.blacklisted).length,
         fullyLearned: isFamilyFullyLearned(family),
         selected: selectedFamilies.has(family)
     }));
 
     // Мобильное отображение карточки слова
     const renderMobileWordCard = (word: WordRow) => {
+        if (!word) return null;
+
         const isEditing = editingId === word.id;
 
         if (isEditing) {
@@ -343,6 +361,14 @@ const WordTable: React.FC = () => {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="word-table-container">
+                <div className="loading-spinner">Загрузка слов...</div>
+            </div>
+        );
+    }
+
     return (
         <div className="word-table-container">
             <div className="table-header">
@@ -460,193 +486,138 @@ const WordTable: React.FC = () => {
                 )}
             </div>
 
-            {/* Прогресс по семействам (старый блок, оставлен для совместимости) */}
-            <div className="families-progress" style={{ display: 'none' }}>
-                <div className="families-header">
-                    <h4>📊 Управление семействами</h4>
-                    <button
-                        onClick={() => setShowFamiliesProgress(!showFamiliesProgress)}
-                        className="families-toggle-btn"
-                    >
-                        {showFamiliesProgress ? '−' : '+'}
-                    </button>
-                </div>
-
-                {showFamiliesProgress && (
-                    <div className="families-content">
-                        <div className="families-actions">
-                            <button onClick={selectAllFamilies} className="families-action-btn select-all">
-                                ✅ Выбрать все
-                            </button>
-                            <button onClick={clearAllFamilies} className="families-action-btn clear-all">
-                                ❌ Очистить все
-                            </button>
-                            <button onClick={() => selectTopFamilies(10)} className="families-action-btn select-top">
-                                🔟 Выбрать 10
-                            </button>
-                            <button onClick={() => removeTopFamilies(10)} className="families-action-btn remove-top">
-                                🔟 Убрать 10
-                            </button>
-                            <button onClick={() => selectTopFamilies(20)} className="families-action-btn select-top">
-                                2️⃣0️⃣ Выбрать 20
-                            </button>
-                            <button onClick={() => removeTopFamilies(20)} className="families-action-btn remove-top">
-                                2️⃣0️⃣ Убрать 20
-                            </button>
-                        </div>
-
-                        <div className="family-badges">
-                            {familyStats.map(family => (
-                                <div
-                                    key={family.name}
-                                    className={`family-badge ${family.fullyLearned ? 'family-complete' : ''} ${family.selected ? 'family-selected' : ''}`}
-                                    onClick={() => toggleFamilySelection(family.name)}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={family.selected}
-                                        onChange={() => toggleFamilySelection(family.name)}
-                                        className="family-checkbox"
-                                        onClick={(e) => e.stopPropagation()}
-                                    />
-                                    <span className="family-name">{family.name}</span>
-                                    <span className="family-progress">
-                    {family.learned}/{family.total}
-                  </span>
-                                    {family.blacklisted > 0 && (
-                                        <span className="family-blacklist">⛔ {family.blacklisted}</span>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                        <div className="selected-count">
-                            Выбрано семейств: {selectedFamilies.size} из {families.length}
-                        </div>
-                    </div>
-                )}
-            </div>
-
             {/* Десктопная таблица */}
             {!isMobile && (
                 <div className="table-wrapper">
-                    <table className="word-table">
-                        <thead>
-                        <tr>
-                            <th>№</th>
-                            <th>Действия</th>
-                            <th>Слово</th>
-                            <th>Транскрипция</th>
-                            <th>Перевод</th>
-                            <th>Часть речи</th>
-                            <th>Пример</th>
-                            <th>Семейство</th>
-                            <th>✅</th>
-                            <th>⛔</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {filteredWords.map(word => (
-                            <tr
-                                key={word.id}
-                                className={`
-                    ${word.learned ? 'row-learned' : ''} 
-                    ${word.blacklisted ? 'row-blacklisted' : ''}
-                  `}
-                            >
-                                <td className="id-cell">{word.id}</td>
+                    {hasWords ? (
+                        <table className="word-table">
+                            <thead>
+                            <tr>
+                                <th>№</th>
+                                <th>Действия</th>
+                                <th>Слово</th>
+                                <th>Транскрипция</th>
+                                <th>Перевод</th>
+                                <th>Часть речи</th>
+                                <th>Пример</th>
+                                <th>Семейство</th>
+                                <th>✅</th>
+                                <th>⛔</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {filteredWords.map(word => (
+                                <tr
+                                    key={word.id}
+                                    className={`
+                      ${word.learned ? 'row-learned' : ''} 
+                      ${word.blacklisted ? 'row-blacklisted' : ''}
+                    `}
+                                >
+                                    <td className="id-cell">{word.id}</td>
 
-                                <td className="actions-cell">
-                                    <button onClick={() => handleSpeak(word.word, 'en')} className="action-btn" title="Озвучить английское">🔊</button>
-                                    <button onClick={() => handleSpeak(word.translation, 'ru')} className="action-btn" title="Озвучить русское">🗣️</button>
+                                    <td className="actions-cell">
+                                        <button onClick={() => handleSpeak(word.word, 'en')} className="action-btn" title="Озвучить английское">🔊</button>
+                                        <button onClick={() => handleSpeak(word.translation, 'ru')} className="action-btn" title="Озвучить русское">🗣️</button>
+                                        {editingId === word.id ? (
+                                            <>
+                                                <button onClick={() => saveEditing(word.id)} className="action-btn save" title="Сохранить">💾</button>
+                                                <button onClick={cancelEditing} className="action-btn cancel" title="Отмена">✖️</button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button onClick={() => startEditing(word)} className="action-btn edit" title="Редактировать">✏️</button>
+                                            </>
+                                        )}
+                                    </td>
+
                                     {editingId === word.id ? (
                                         <>
-                                            <button onClick={() => saveEditing(word.id)} className="action-btn save" title="Сохранить">💾</button>
-                                            <button onClick={cancelEditing} className="action-btn cancel" title="Отмена">✖️</button>
+                                            <td><input value={editForm.word || ''} onChange={(e) => handleEditChange('word', e.target.value)} className="edit-input" /></td>
+                                            <td><input value={editForm.transcription || ''} onChange={(e) => handleEditChange('transcription', e.target.value)} className="edit-input" /></td>
+                                            <td><input value={editForm.translation || ''} onChange={(e) => handleEditChange('translation', e.target.value)} className="edit-input" /></td>
+                                            <td>
+                                                <select value={editForm.partOfSpeech || ''} onChange={(e) => handleEditChange('partOfSpeech', e.target.value)} className="edit-select">
+                                                    <option>глагол</option>
+                                                    <option>сущ.</option>
+                                                    <option>прил.</option>
+                                                    <option>наречие</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <textarea value={editForm.example || ''} onChange={(e) => handleEditChange('example', e.target.value)} className="edit-textarea" rows={2} />
+                                                <textarea value={editForm.exampleTranslation || ''} onChange={(e) => handleEditChange('exampleTranslation', e.target.value)} className="edit-textarea" rows={2} placeholder="Перевод" />
+                                            </td>
+                                            <td>
+                                                <select value={editForm.rootFamily || ''} onChange={(e) => handleEditChange('rootFamily', e.target.value)} className="edit-select">
+                                                    {families.map(f => (
+                                                        <option key={f} value={f}>{f}</option>
+                                                    ))}
+                                                </select>
+                                            </td>
                                         </>
                                     ) : (
                                         <>
-                                            <button onClick={() => startEditing(word)} className="action-btn edit" title="Редактировать">✏️</button>
+                                            <td className="word-cell">{word.word}</td>
+                                            <td className="transcription-cell">{word.transcription}</td>
+                                            <td className="translation-cell">{word.translation}</td>
+                                            <td className="pos-cell">{word.partOfSpeech}</td>
+                                            <td className="example-cell">
+                                                <div className="example-en">
+                                                    {highlightWordInExample(word.example, word.word, 'en')}
+                                                </div>
+                                                <div className="example-ru">
+                                                    {highlightWordInExample(word.exampleTranslation, word.translation, 'ru')}
+                                                </div>
+                                            </td>
+                                            <td className="family-cell">{word.rootFamily}</td>
                                         </>
                                     )}
-                                </td>
 
-                                {editingId === word.id ? (
-                                    <>
-                                        <td><input value={editForm.word || ''} onChange={(e) => handleEditChange('word', e.target.value)} className="edit-input" /></td>
-                                        <td><input value={editForm.transcription || ''} onChange={(e) => handleEditChange('transcription', e.target.value)} className="edit-input" /></td>
-                                        <td><input value={editForm.translation || ''} onChange={(e) => handleEditChange('translation', e.target.value)} className="edit-input" /></td>
-                                        <td>
-                                            <select value={editForm.partOfSpeech || ''} onChange={(e) => handleEditChange('partOfSpeech', e.target.value)} className="edit-select">
-                                                <option>глагол</option>
-                                                <option>сущ.</option>
-                                                <option>прил.</option>
-                                                <option>наречие</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <textarea value={editForm.example || ''} onChange={(e) => handleEditChange('example', e.target.value)} className="edit-textarea" rows={2} />
-                                            <textarea value={editForm.exampleTranslation || ''} onChange={(e) => handleEditChange('exampleTranslation', e.target.value)} className="edit-textarea" rows={2} placeholder="Перевод" />
-                                        </td>
-                                        <td>
-                                            <select value={editForm.rootFamily || ''} onChange={(e) => handleEditChange('rootFamily', e.target.value)} className="edit-select">
-                                                {families.map(f => (
-                                                    <option key={f} value={f}>{f}</option>
-                                                ))}
-                                            </select>
-                                        </td>
-                                    </>
-                                ) : (
-                                    <>
-                                        <td className="word-cell">{word.word}</td>
-                                        <td className="transcription-cell">{word.transcription}</td>
-                                        <td className="translation-cell">{word.translation}</td>
-                                        <td className="pos-cell">{word.partOfSpeech}</td>
-                                        <td className="example-cell">
-                                            <div className="example-en">
-                                                {highlightWordInExample(word.example, word.word, 'en')}
-                                            </div>
-                                            <div className="example-ru">
-                                                {highlightWordInExample(word.exampleTranslation, word.translation, 'ru')}
-                                            </div>
-                                        </td>
-                                        <td className="family-cell">{word.rootFamily}</td>
-                                    </>
-                                )}
+                                    <td className="checkbox-cell">
+                                        <label className="checkbox-label">
+                                            <input
+                                                type="checkbox"
+                                                checked={word.learned}
+                                                onChange={() => handleToggleLearned(word.id)}
+                                            />
+                                            <span className="checkbox-custom"></span>
+                                        </label>
+                                    </td>
 
-                                <td className="checkbox-cell">
-                                    <label className="checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            checked={word.learned}
-                                            onChange={() => handleToggleLearned(word.id)}
-                                        />
-                                        <span className="checkbox-custom"></span>
-                                    </label>
-                                </td>
-
-                                <td className="checkbox-cell">
-                                    <label className="checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            checked={word.blacklisted}
-                                            onChange={() => handleToggleBlacklist(word.id)}
-                                        />
-                                        <span className="checkbox-custom"></span>
-                                    </label>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                                    <td className="checkbox-cell">
+                                        <label className="checkbox-label">
+                                            <input
+                                                type="checkbox"
+                                                checked={word.blacklisted}
+                                                onChange={() => handleToggleBlacklist(word.id)}
+                                            />
+                                            <span className="checkbox-custom"></span>
+                                        </label>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <div className="no-data-message">
+                            <p>📭 Нет слов для отображения</p>
+                            <p>Попробуйте изменить фильтры или добавить слова</p>
+                        </div>
+                    )}
                 </div>
             )}
 
             {/* Мобильные карточки */}
             {isMobile && (
                 <div className="mobile-words-list">
-                    {filteredWords.map(word => renderMobileWordCard(word))}
-                    {filteredWords.length === 0 && (
-                        <div className="mobile-no-words">Нет слов для отображения</div>
+                    {hasWords ? (
+                        filteredWords.map(word => renderMobileWordCard(word))
+                    ) : (
+                        <div className="mobile-no-words">
+                            <p>📭 Нет слов для отображения</p>
+                            <p>Попробуйте изменить фильтры</p>
+                        </div>
                     )}
                 </div>
             )}

@@ -1126,3 +1126,17 @@
     height: 16px;
     cursor: pointer;
 }
+
+.no-data-message {
+    text-align: center;
+    padding: 40px;
+    background: #f7fafc;
+    border-radius: 8px;
+    color: #718096;
+    font-size: 16px;
+}
+
+.no-data-message p:first-child {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
